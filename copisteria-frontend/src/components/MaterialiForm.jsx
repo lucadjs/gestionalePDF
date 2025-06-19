@@ -28,17 +28,17 @@ export default function MaterialiForm() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:4000/api/lookup/tipi_materiale")
+      .get(`${API_BASE_URL}/api/lookup/tipi_materiale`)
       .then((res) => setTipi(res.data));
     axios
-      .get("http://localhost:4000/api/lookup/formati_materiale")
+      .get(`${API_BASE_URL}/api/lookup/formati_materiale`)
       .then((res) => setFormati(res.data));
     loadMateriali();
   }, []);
 
   function loadMateriali() {
     axios
-      .get("http://localhost:4000/api/materiali")
+      .get(`${API_BASE_URL}/api/materiali`)
       .then((res) => setMateriali(res.data));
   }
 
@@ -49,15 +49,13 @@ export default function MaterialiForm() {
   function handleSubmit(e) {
     e.preventDefault();
     if (editingId) {
-      axios
-        .put(`http://localhost:4000/api/materiali/${editingId}`, form)
-        .then(() => {
-          setForm(initialFormState);
-          setEditingId(null);
-          loadMateriali();
-        });
+      axios.put(`${API_BASE_URL}/api/materiali/${editingId}`, form).then(() => {
+        setForm(initialFormState);
+        setEditingId(null);
+        loadMateriali();
+      });
     } else {
-      axios.post("http://localhost:4000/api/materiali", form).then(() => {
+      axios.post(`${API_BASE_URL}/api/materiali`, form).then(() => {
         setForm(initialFormState);
         loadMateriali();
       });
@@ -71,9 +69,7 @@ export default function MaterialiForm() {
 
   function handleDelete(id) {
     if (window.confirm("Vuoi cancellare questo materiale?")) {
-      axios
-        .delete(`http://localhost:4000/api/materiali/${id}`)
-        .then(loadMateriali);
+      axios.delete(`${API_BASE_URL}/api/materiali/${id}`).then(loadMateriali);
       if (editingId === id) {
         setEditingId(null);
         setForm(initialFormState);

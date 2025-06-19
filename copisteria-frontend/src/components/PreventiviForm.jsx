@@ -52,17 +52,17 @@ export default function PreventiviForm() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:4000/api/clienti")
+      .get(`${API_BASE_URL}/api/clienti/`)
       .then((res) => setClienti(res.data));
     axios
-      .get("http://localhost:4000/api/lavorazioni")
+      .get(`${API_BASE_URL}/api/lavorazioni`)
       .then((res) => setLavorazioni(res.data));
     loadPreventivi();
   }, []);
 
   function loadPreventivi() {
     axios
-      .get("http://localhost:4000/api/preventivi")
+      .get(`${API_BASE_URL}/api/preventivi`)
       .then((res) => setPreventivi(res.data));
   }
 
@@ -153,7 +153,7 @@ export default function PreventiviForm() {
       };
     });
     axios
-      .post("http://localhost:4000/api/preventivi", {
+      .post(`${API_BASE_URL}/api/preventivi`, {
         ...form,
         totale: totaleIvato,
         righe: righeCompilate,
@@ -215,9 +215,7 @@ export default function PreventiviForm() {
         "Vuoi davvero cancellare definitivamente questo preventivo?"
       )
     ) {
-      await axios.delete(
-        `http://localhost:4000/api/preventivi/${preventivo.id}`
-      );
+      await axios.delete(`${API_BASE_URL}/api/preventivi/${preventivo.id}`);
       toast.info("Preventivo eliminato!");
       loadPreventivi();
     }
@@ -230,7 +228,7 @@ export default function PreventiviForm() {
       )
     ) {
       await axios.post(
-        `http://localhost:4000/api/preventivi/${preventivo.id}/converti`
+        `${API_BASE_URL}/api/preventivi/${preventivo.id}/converti`
       );
       toast.success("Preventivo convertito in ordine!");
       loadPreventivi();
@@ -241,9 +239,7 @@ export default function PreventiviForm() {
     if (
       window.confirm("Vuoi inviare il preventivo via email al cliente ora?")
     ) {
-      await axios.post(
-        `http://localhost:4000/api/preventivi/${preventivo.id}/email`
-      );
+      await axios.post(`${API_BASE_URL}/api/preventivi/${preventivo.id}/email`);
       toast.success("Email inviata!");
     }
   }

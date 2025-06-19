@@ -22,17 +22,17 @@ export default function LavorazioniForm() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:4000/api/lookup/tipi_lavorazione")
+      .get(`${API_BASE_URL}/api/lookup/tipi_lavorazione`)
       .then((res) => setTipiLav(res.data));
     axios
-      .get("http://localhost:4000/api/lookup/supporti")
+      .get(`${API_BASE_URL}/api/lookup/supporti`)
       .then((res) => setSupporti(res.data));
     loadLavorazioni();
   }, []);
 
   function loadLavorazioni() {
     axios
-      .get("http://localhost:4000/api/lavorazioni")
+      .get(`${API_BASE_URL}/api/lavorazioni`)
       .then((res) => setLavorazioni(res.data));
   }
 
@@ -44,14 +44,14 @@ export default function LavorazioniForm() {
     e.preventDefault();
     if (editingId) {
       axios
-        .put(`http://localhost:4000/api/lavorazioni/${editingId}`, form)
+        .put(`${API_BASE_URL}/api/lavorazioni/${editingId}`, form)
         .then(() => {
           setForm(initialFormState);
           setEditingId(null);
           loadLavorazioni();
         });
     } else {
-      axios.post("http://localhost:4000/api/lavorazioni", form).then(() => {
+      axios.post(`${API_BASE_URL}/api/lavorazioni`, form).then(() => {
         setForm(initialFormState);
         loadLavorazioni();
       });
@@ -66,7 +66,7 @@ export default function LavorazioniForm() {
   function handleDelete(id) {
     if (window.confirm("Vuoi cancellare questa lavorazione?")) {
       axios
-        .delete(`http://localhost:4000/api/lavorazioni/${id}`)
+        .delete(`${API_BASE_URL}/api/lavorazioni/${id}`)
         .then(loadLavorazioni);
       if (editingId === id) {
         setEditingId(null);

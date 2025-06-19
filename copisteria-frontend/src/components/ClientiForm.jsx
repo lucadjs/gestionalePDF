@@ -35,7 +35,7 @@ export default function ClientiForm() {
 
   function loadClienti() {
     axios
-      .get("http://localhost:4000/api/clienti")
+      .get(`${API_BASE_URL}/api/clienti/`)
       .then((res) => setClienti(res.data));
   }
 
@@ -46,15 +46,13 @@ export default function ClientiForm() {
   function handleSubmit(e) {
     e.preventDefault();
     if (editingId) {
-      axios
-        .put(`http://localhost:4000/api/clienti/${editingId}`, form)
-        .then(() => {
-          setForm(initialFormState);
-          setEditingId(null);
-          loadClienti();
-        });
+      axios.put(`${API_BASE_URL}/api/clienti/${editingId}`, form).then(() => {
+        setForm(initialFormState);
+        setEditingId(null);
+        loadClienti();
+      });
     } else {
-      axios.post("http://localhost:4000/api/clienti", form).then(() => {
+      axios.post(`${API_BASE_URL}/api/clienti/`, form).then(() => {
         setForm(initialFormState);
         loadClienti();
       });
@@ -68,7 +66,7 @@ export default function ClientiForm() {
 
   function handleDelete(id) {
     if (window.confirm("Vuoi cancellare questo cliente?")) {
-      axios.delete(`http://localhost:4000/api/clienti/${id}`).then(loadClienti);
+      axios.delete(`${API_BASE_URL}/api/clienti/${id}`).then(loadClienti);
       if (editingId === id) {
         setEditingId(null);
         setForm(initialFormState);
