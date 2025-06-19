@@ -560,7 +560,7 @@ export default function PreventiviForm() {
                     }}
                     onClick={async () => {
                       const resp = await axios.get(
-                        `http://localhost:4000/api/preventivi/${p.id}`
+                        `${API_URL}/api/preventivi/${p.id}`
                       );
                       await esportaPDF(p, resp.data.righe);
                     }}
