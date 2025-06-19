@@ -23,7 +23,7 @@ export default async function handler(req, res) {
 
     // --- GET: Tutti i clienti
     if (req.method === "GET") {
-      const [rows] = await connection.query("SELECT * FROM clienti");
+      const [rows] = await connection.query("SELECT * FROM cliente");
       return res.status(200).json(rows);
     }
 
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     if (req.method === "POST") {
       const data = req.body;
       const [result] = await connection.execute(
-        `INSERT INTO clienti 
+        `INSERT INTO cliente
         (categoria, nomeAzienda, nome, indirizzo, citta, provincia, cap, telefono, email, pec, codice_fiscale, partita_iva, codice_univoco, attivo, attivo_web, codice_sconto, note, data_registrazione, ultimo_contatto)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
@@ -58,7 +58,7 @@ export default async function handler(req, res) {
       );
       // Ritorna il nuovo record
       const [newCliente] = await connection.query(
-        "SELECT * FROM clienti WHERE id = ?",
+        "SELECT * FROM cliente WHERE id = ?",
         [result.insertId]
       );
       return res.status(201).json(newCliente[0]);
@@ -70,7 +70,7 @@ export default async function handler(req, res) {
       if (!id) return res.status(400).json({ error: "ID mancante" });
       const data = req.body;
       await connection.execute(
-        `UPDATE clienti SET 
+        `UPDATE cliente SET 
         categoria = ?, nomeAzienda = ?, nome = ?, indirizzo = ?, citta = ?, provincia = ?, cap = ?, telefono = ?, email = ?, pec = ?, codice_fiscale = ?, partita_iva = ?, codice_univoco = ?, attivo = ?, attivo_web = ?, codice_sconto = ?, note = ?, data_registrazione = ?, ultimo_contatto = ?
         WHERE id = ?`,
         [
@@ -103,7 +103,7 @@ export default async function handler(req, res) {
     if (req.method === "DELETE") {
       const id = req.query.id || req.body.id;
       if (!id) return res.status(400).json({ error: "ID mancante" });
-      await connection.execute("DELETE FROM clienti WHERE id = ?", [id]);
+      await connection.execute("DELETE FROM cliente WHERE id = ?", [id]);
       return res.sendStatus(204);
     }
 

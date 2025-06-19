@@ -3,8 +3,8 @@ import { Cliente } from "../models/index.js";
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const clienti = await Cliente.findAll();
-  res.json(clienti);
+  const cliente = await Cliente.findAll();
+  res.json(cliente);
 });
 
 router.post("/", async (req, res) => {
