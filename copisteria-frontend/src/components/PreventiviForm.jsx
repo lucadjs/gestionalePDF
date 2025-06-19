@@ -10,6 +10,8 @@ import {
 } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+
 // Utility: prende logo da upload, o da /public/logo.png
 async function getLogoDataUrl(logoDataUrl) {
   if (logoDataUrl) return logoDataUrl;
@@ -52,7 +54,7 @@ export default function PreventiviForm() {
 
   useEffect(() => {
     axios
-      .get(`${API_BASE_URL}/api/clienti/`)
+      .get(`${API_BASE_URL}/api/clienti`)
       .then((res) => setClienti(res.data));
     axios
       .get(`${API_BASE_URL}/api/lavorazioni`)
@@ -254,7 +256,7 @@ export default function PreventiviForm() {
     }
   }
 
-  // Ricerca filtro live
+  // Ricerca filtro live (dichiarata **sempre** prima del return!)
   const preventiviFiltrati = preventivi.filter((p) => {
     const cliente = clienti.find((c) => c.id === p.clienteId);
     const searchStr = [
@@ -271,7 +273,6 @@ export default function PreventiviForm() {
     return searchStr.includes(ricerca.toLowerCase());
   });
 
-  // Funzione di controllo: preventivo già convertito in ordine?
   function isConverted(p) {
     return (p.note || "").toLowerCase().includes("convertito in ordine n");
   }
@@ -561,7 +562,7 @@ export default function PreventiviForm() {
                     }}
                     onClick={async () => {
                       const resp = await axios.get(
-                        `http://localhost:4000/api/preventivi/${p.id}`
+                        `${API_BASE_URL}/api/preventivi/${p.id}`
                       );
                       await esportaPDF(p, resp.data.righe);
                     }}
