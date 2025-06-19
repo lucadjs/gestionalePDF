@@ -10,8 +10,6 @@ import {
 } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "";
-
 // Utility: prende logo da upload, o da /public/logo.png
 async function getLogoDataUrl(logoDataUrl) {
   if (logoDataUrl) return logoDataUrl;
@@ -54,17 +52,17 @@ export default function PreventiviForm() {
 
   useEffect(() => {
     axios
-      .get(`${API_BASE_URL}/api/clienti`)
+      .get("http://localhost:4000/api/clienti")
       .then((res) => setClienti(res.data));
     axios
-      .get(`${API_BASE_URL}/api/lavorazioni`)
+      .get("http://localhost:4000/api/lavorazioni")
       .then((res) => setLavorazioni(res.data));
     loadPreventivi();
   }, []);
 
   function loadPreventivi() {
     axios
-      .get(`${API_BASE_URL}/api/preventivi`)
+      .get("http://localhost:4000/api/preventivi")
       .then((res) => setPreventivi(res.data));
   }
 
@@ -155,7 +153,7 @@ export default function PreventiviForm() {
       };
     });
     axios
-      .post(`${API_BASE_URL}/api/preventivi`, {
+      .post("http://localhost:4000/api/preventivi", {
         ...form,
         totale: totaleIvato,
         righe: righeCompilate,
@@ -217,7 +215,9 @@ export default function PreventiviForm() {
         "Vuoi davvero cancellare definitivamente questo preventivo?"
       )
     ) {
-      await axios.delete(`${API_BASE_URL}/api/preventivi/${preventivo.id}`);
+      await axios.delete(
+        `http://localhost:4000/api/preventivi/${preventivo.id}`
+      );
       toast.info("Preventivo eliminato!");
       loadPreventivi();
     }
@@ -230,7 +230,7 @@ export default function PreventiviForm() {
       )
     ) {
       await axios.post(
-        `${API_BASE_URL}/api/preventivi/${preventivo.id}/converti`
+        `http://localhost:4000/api/preventivi/${preventivo.id}/converti`
       );
       toast.success("Preventivo convertito in ordine!");
       loadPreventivi();
@@ -241,7 +241,9 @@ export default function PreventiviForm() {
     if (
       window.confirm("Vuoi inviare il preventivo via email al cliente ora?")
     ) {
-      await axios.post(`${API_BASE_URL}/api/preventivi/${preventivo.id}/email`);
+      await axios.post(
+        `http://localhost:4000/api/preventivi/${preventivo.id}/email`
+      );
       toast.success("Email inviata!");
     }
   }
@@ -256,7 +258,7 @@ export default function PreventiviForm() {
     }
   }
 
-  // Ricerca filtro live (dichiarata **sempre** prima del return!)
+  // Ricerca filtro live
   const preventiviFiltrati = preventivi.filter((p) => {
     const cliente = clienti.find((c) => c.id === p.clienteId);
     const searchStr = [
@@ -273,6 +275,7 @@ export default function PreventiviForm() {
     return searchStr.includes(ricerca.toLowerCase());
   });
 
+  // Funzione di controllo: preventivo già convertito in ordine?
   function isConverted(p) {
     return (p.note || "").toLowerCase().includes("convertito in ordine n");
   }
@@ -562,7 +565,7 @@ export default function PreventiviForm() {
                     }}
                     onClick={async () => {
                       const resp = await axios.get(
-                        `${API_BASE_URL}/api/preventivi/${p.id}`
+                        `http://localhost:4000/api/preventivi/${p.id}`
                       );
                       await esportaPDF(p, resp.data.righe);
                     }}
