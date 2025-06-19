@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || ""; // se frontend e backend sono nello stesso progetto puoi anche lasciare ""
+
 const initialFormState = {
   categoria: "",
   nomeAzienda: "",
@@ -35,8 +37,17 @@ export default function ClientiForm() {
 
   function loadClienti() {
     axios
-      .get("http://localhost:4000/api/clienti")
-      .then((res) => setClienti(res.data));
+      .get(`${API_BASE_URL}/api/clienti`)
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setClienti(res.data);
+        } else if (res.data && Array.isArray(res.data.clienti)) {
+          setClienti(res.data.clienti);
+        } else {
+          setClienti([]);
+        }
+      })
+      .catch(() => setClienti([]));
   }
 
   function handleChange(e) {
@@ -46,15 +57,16 @@ export default function ClientiForm() {
   function handleSubmit(e) {
     e.preventDefault();
     if (editingId) {
+      // ---- MODIFICA QUI: id va in querystring ----
       axios
-        .put(`http://localhost:4000/api/clienti/${editingId}`, form)
+        .put(`${API_BASE_URL}/api/clienti?id=${editingId}`, form)
         .then(() => {
           setForm(initialFormState);
           setEditingId(null);
           loadClienti();
         });
     } else {
-      axios.post("http://localhost:4000/api/clienti", form).then(() => {
+      axios.post(`${API_BASE_URL}/api/clienti`, form).then(() => {
         setForm(initialFormState);
         loadClienti();
       });
@@ -68,7 +80,8 @@ export default function ClientiForm() {
 
   function handleDelete(id) {
     if (window.confirm("Vuoi cancellare questo cliente?")) {
-      axios.delete(`http://localhost:4000/api/clienti/${id}`).then(loadClienti);
+      // ---- MODIFICA QUI: id va in querystring ----
+      axios.delete(`${API_BASE_URL}/api/clienti?id=${id}`).then(loadClienti);
       if (editingId === id) {
         setEditingId(null);
         setForm(initialFormState);
@@ -88,6 +101,7 @@ export default function ClientiForm() {
         onSubmit={handleSubmit}
         style={{ display: "flex", flexWrap: "wrap", gap: 8 }}
       >
+        {/* ...input come prima... */}
         <select name="categoria" value={form.categoria} onChange={handleChange}>
           <option value="">Categoria</option>
           <option value="a">Azienda</option>

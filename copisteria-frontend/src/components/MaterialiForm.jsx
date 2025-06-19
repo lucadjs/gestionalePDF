@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
 const initialFormState = {
   codforn: "",
@@ -27,18 +28,19 @@ export default function MaterialiForm() {
   const [filtro, setFiltro] = useState("");
 
   useEffect(() => {
+    // Cambia qui: lookup a /api/lookup?type=tipi_materiale
     axios
-      .get("http://localhost:4000/api/lookup/tipi_materiale")
+      .get(`${API_BASE_URL}/api/lookup?type=tipi_materiale`)
       .then((res) => setTipi(res.data));
     axios
-      .get("http://localhost:4000/api/lookup/formati_materiale")
+      .get(`${API_BASE_URL}/api/lookup?type=formati_materiale`)
       .then((res) => setFormati(res.data));
     loadMateriali();
   }, []);
 
   function loadMateriali() {
     axios
-      .get("http://localhost:4000/api/materiali")
+      .get(`${API_BASE_URL}/api/materiali`)
       .then((res) => setMateriali(res.data));
   }
 
@@ -49,15 +51,16 @@ export default function MaterialiForm() {
   function handleSubmit(e) {
     e.preventDefault();
     if (editingId) {
+      // Cambia: id in querystring!
       axios
-        .put(`http://localhost:4000/api/materiali/${editingId}`, form)
+        .put(`${API_BASE_URL}/api/materiali?id=${editingId}`, form)
         .then(() => {
           setForm(initialFormState);
           setEditingId(null);
           loadMateriali();
         });
     } else {
-      axios.post("http://localhost:4000/api/materiali", form).then(() => {
+      axios.post(`${API_BASE_URL}/api/materiali`, form).then(() => {
         setForm(initialFormState);
         loadMateriali();
       });
@@ -71,8 +74,9 @@ export default function MaterialiForm() {
 
   function handleDelete(id) {
     if (window.confirm("Vuoi cancellare questo materiale?")) {
+      // Cambia: id in querystring!
       axios
-        .delete(`http://localhost:4000/api/materiali/${id}`)
+        .delete(`${API_BASE_URL}/api/materiali?id=${id}`)
         .then(loadMateriali);
       if (editingId === id) {
         setEditingId(null);
