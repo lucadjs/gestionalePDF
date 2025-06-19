@@ -1,28 +1,42 @@
-import express from "express";
 import {
+  sequelize,
   TipoLavorazione,
   Supporto,
   TipoMateriale,
   FormatoMateriale,
 } from "../models/index.js";
 
-const router = express.Router();
+export default async function handler(req, res) {
+  await sequelize.sync();
 
-router.get("/tipi_lavorazione", async (req, res) => {
-  const items = await TipoLavorazione.findAll();
-  res.json(items);
-});
-router.get("/supporti", async (req, res) => {
-  const items = await Supporto.findAll();
-  res.json(items);
-});
-router.get("/tipi_materiale", async (req, res) => {
-  const items = await TipoMateriale.findAll();
-  res.json(items);
-});
-router.get("/formati_materiale", async (req, res) => {
-  const items = await FormatoMateriale.findAll();
-  res.json(items);
-});
+  // GET /api/lookup?type=tipi_lavorazione
+  // GET /api/lookup?type=supporti
+  // GET /api/lookup?type=tipi_materiale
+  // GET /api/lookup?type=formati_materiale
 
-export default router;
+  if (req.method === "GET") {
+    const { type } = req.query;
+
+    if (type === "tipi_lavorazione") {
+      const items = await TipoLavorazione.findAll();
+      return res.status(200).json(items);
+    }
+    if (type === "supporti") {
+      const items = await Supporto.findAll();
+      return res.status(200).json(items);
+    }
+    if (type === "tipi_materiale") {
+      const items = await TipoMateriale.findAll();
+      return res.status(200).json(items);
+    }
+    if (type === "formati_materiale") {
+      const items = await FormatoMateriale.findAll();
+      return res.status(200).json(items);
+    }
+    // Nessun tipo valido trovato
+    return res.status(400).json({ error: "Parametro type non valido" });
+  }
+
+  res.setHeader("Allow", ["GET"]);
+  res.status(405).end(`Metodo ${req.method} non consentito`);
+}

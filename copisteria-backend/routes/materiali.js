@@ -1,31 +1,47 @@
-import express from "express";
-import { Materiale, TipoMateriale, FormatoMateriale } from "../models/index.js";
+import {
+  sequelize,
+  Materiale,
+  TipoMateriale,
+  FormatoMateriale,
+} from "../models/index.js";
 
-const router = express.Router();
+export default async function handler(req, res) {
+  await sequelize.sync();
 
-router.get("/", async (req, res) => {
-  const materiali = await Materiale.findAll({
-    include: [
-      { model: TipoMateriale, attributes: ["id", "nome"] },
-      { model: FormatoMateriale, attributes: ["id", "nome"] },
-    ],
-  });
-  res.json(materiali);
-});
+  // GET /api/materiali
+  if (req.method === "GET") {
+    const materiali = await Materiale.findAll({
+      include: [
+        { model: TipoMateriale, attributes: ["id", "nome"] },
+        { model: FormatoMateriale, attributes: ["id", "nome"] },
+      ],
+    });
+    return res.status(200).json(materiali);
+  }
 
-router.post("/", async (req, res) => {
-  const materiale = await Materiale.create(req.body);
-  res.json(materiale);
-});
+  // POST /api/materiali
+  if (req.method === "POST") {
+    const materiale = await Materiale.create(req.body);
+    return res.status(201).json(materiale);
+  }
 
-router.put("/:id", async (req, res) => {
-  await Materiale.update(req.body, { where: { id: req.params.id } });
-  res.sendStatus(204);
-});
+  // PUT /api/materiali?id=123
+  if (req.method === "PUT") {
+    const id = req.query.id || req.body.id;
+    if (!id) return res.status(400).json({ error: "ID mancante" });
+    await Materiale.update(req.body, { where: { id } });
+    return res.sendStatus(204);
+  }
 
-router.delete("/:id", async (req, res) => {
-  await Materiale.destroy({ where: { id: req.params.id } });
-  res.sendStatus(204);
-});
+  // DELETE /api/materiali?id=123
+  if (req.method === "DELETE") {
+    const id = req.query.id || req.body.id;
+    if (!id) return res.status(400).json({ error: "ID mancante" });
+    await Materiale.destroy({ where: { id } });
+    return res.sendStatus(204);
+  }
 
-export default router;
+  // Metodo non consentito
+  res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);
+  res.status(405).end(`Metodo ${req.method} non consentito`);
+}

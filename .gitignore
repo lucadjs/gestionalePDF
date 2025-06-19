@@ -2,3 +2,4 @@ copisteria-backend/node_modules
 copisteria-frontend/node_modules
 copisteria-backend/.env
 copisteria-frontend/.env
+.vercel
