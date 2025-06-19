@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 import { esportaPreventivoPDF } from "../utils/pdfPreventivo";
 import {
@@ -54,18 +54,16 @@ export default function PreventiviForm() {
   const email = "info@copisteriapdf.it";
 
   useEffect(() => {
+    axios.get(`${API_URL}/api/clienti`).then((res) => setClienti(res.data));
     axios
-      .get(`${API_BASE_URL}/api/clienti`)
-      .then((res) => setClienti(res.data));
-    axios
-      .get(`${API_BASE_URL}/api/lavorazioni`)
+      .get(`${API_URL}/api/lavorazioni`)
       .then((res) => setLavorazioni(res.data));
     loadPreventivi();
   }, []);
 
   function loadPreventivi() {
     axios
-      .get(`${API_BASE_URL}/api/preventivi`)
+      .get(`${API_URL}/api/preventivi`)
       .then((res) => setPreventivi(res.data));
   }
 
@@ -156,7 +154,7 @@ export default function PreventiviForm() {
       };
     });
     axios
-      .post(`${API_BASE_URL}/api/preventivi`, {
+      .post(`${API_URL}/api/preventivi`, {
         ...form,
         totale: totaleIvato,
         righe: righeCompilate,
@@ -218,7 +216,7 @@ export default function PreventiviForm() {
         "Vuoi davvero cancellare definitivamente questo preventivo?"
       )
     ) {
-      await axios.delete(`${API_BASE_URL}/api/preventivi/${preventivo.id}`);
+      await axios.delete(`${API_URL}/api/preventivi/${preventivo.id}`);
       toast.info("Preventivo eliminato!");
       loadPreventivi();
     }
@@ -230,9 +228,7 @@ export default function PreventiviForm() {
         "Confermi la conversione di questo preventivo in ordine?\nNon sarà più possibile riconvertirlo."
       )
     ) {
-      await axios.post(
-        `${API_BASE_URL}/api/preventivi/${preventivo.id}/converti`
-      );
+      await axios.post(`${API_URL}/api/preventivi/${preventivo.id}/converti`);
       toast.success("Preventivo convertito in ordine!");
       loadPreventivi();
     }
@@ -242,7 +238,7 @@ export default function PreventiviForm() {
     if (
       window.confirm("Vuoi inviare il preventivo via email al cliente ora?")
     ) {
-      await axios.post(`${API_BASE_URL}/api/preventivi/${preventivo.id}/email`);
+      await axios.post(`${API_URL}/api/preventivi/${preventivo.id}/email`);
       toast.success("Email inviata!");
     }
   }

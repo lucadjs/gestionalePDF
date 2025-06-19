@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 const initialFormState = {
   tipo_id: "",
@@ -23,17 +23,17 @@ export default function LavorazioniForm() {
 
   useEffect(() => {
     axios
-      .get(`${API_BASE_URL}/api/lookup/tipi_lavorazione`)
+      .get(`${API_URL}/api/lookup/tipi_lavorazione`)
       .then((res) => setTipiLav(res.data));
     axios
-      .get(`${API_BASE_URL}/api/lookup/supporti`)
+      .get(`${API_URL}/api/lookup/supporti`)
       .then((res) => setSupporti(res.data));
     loadLavorazioni();
   }, []);
 
   function loadLavorazioni() {
     axios
-      .get(`${API_BASE_URL}/api/lavorazioni`)
+      .get(`${API_URL}/api/lavorazioni`)
       .then((res) => setLavorazioni(res.data));
   }
 
@@ -44,15 +44,13 @@ export default function LavorazioniForm() {
   function handleSubmit(e) {
     e.preventDefault();
     if (editingId) {
-      axios
-        .put(`${API_BASE_URL}/api/lavorazioni/${editingId}`, form)
-        .then(() => {
-          setForm(initialFormState);
-          setEditingId(null);
-          loadLavorazioni();
-        });
+      axios.put(`${API_URL}/api/lavorazioni/${editingId}`, form).then(() => {
+        setForm(initialFormState);
+        setEditingId(null);
+        loadLavorazioni();
+      });
     } else {
-      axios.post(`${API_BASE_URL}/api/lavorazioni`, form).then(() => {
+      axios.post(`${API_URL}/api/lavorazioni`, form).then(() => {
         setForm(initialFormState);
         loadLavorazioni();
       });
@@ -66,9 +64,7 @@ export default function LavorazioniForm() {
 
   function handleDelete(id) {
     if (window.confirm("Vuoi cancellare questa lavorazione?")) {
-      axios
-        .delete(`${API_BASE_URL}/api/lavorazioni/${id}`)
-        .then(loadLavorazioni);
+      axios.delete(`${API_URL}/api/lavorazioni/${id}`).then(loadLavorazioni);
       if (editingId === id) {
         setEditingId(null);
         setForm(initialFormState);

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 const initialFormState = {
   categoria: "",
@@ -36,9 +36,7 @@ export default function ClientiForm() {
   }, []);
 
   function loadClienti() {
-    axios
-      .get(`${API_BASE_URL}/api/clienti`)
-      .then((res) => setClienti(res.data));
+    axios.get(`${API_URL}/api/clienti`).then((res) => setClienti(res.data));
   }
 
   function handleChange(e) {
@@ -48,13 +46,13 @@ export default function ClientiForm() {
   function handleSubmit(e) {
     e.preventDefault();
     if (editingId) {
-      axios.put(`${API_BASE_URL}/api/clienti/${editingId}`, form).then(() => {
+      axios.put(`${API_URL}/api/clienti/${editingId}`, form).then(() => {
         setForm(initialFormState);
         setEditingId(null);
         loadClienti();
       });
     } else {
-      axios.post(`${API_BASE_URL}/api/clienti`, form).then(() => {
+      axios.post(`${API_URL}/api/clienti`, form).then(() => {
         setForm(initialFormState);
         loadClienti();
       });
@@ -68,7 +66,7 @@ export default function ClientiForm() {
 
   function handleDelete(id) {
     if (window.confirm("Vuoi cancellare questo cliente?")) {
-      axios.delete(`${API_BASE_URL}/api/clienti/${id}`).then(loadClienti);
+      axios.delete(`${API_URL}/api/clienti/${id}`).then(loadClienti);
       if (editingId === id) {
         setEditingId(null);
         setForm(initialFormState);

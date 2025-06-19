@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 const initialFormState = {
   codforn: "",
@@ -29,18 +30,16 @@ export default function MaterialiForm() {
 
   useEffect(() => {
     axios
-      .get(`${API_BASE_URL}/api/lookup/tipi_materiale`)
+      .get(`${API_URL}/api/lookup/tipi_materiale`)
       .then((res) => setTipi(res.data));
     axios
-      .get(`${API_BASE_URL}/api/lookup/formati_materiale`)
+      .get(`${API_URL}/api/lookup/formati_materiale`)
       .then((res) => setFormati(res.data));
     loadMateriali();
   }, []);
 
   function loadMateriali() {
-    axios
-      .get(`${API_BASE_URL}/api/materiali`)
-      .then((res) => setMateriali(res.data));
+    axios.get(`${API_URL}/api/materiali`).then((res) => setMateriali(res.data));
   }
 
   function handleChange(e) {
@@ -50,13 +49,13 @@ export default function MaterialiForm() {
   function handleSubmit(e) {
     e.preventDefault();
     if (editingId) {
-      axios.put(`${API_BASE_URL}/api/materiali/${editingId}`, form).then(() => {
+      axios.put(`${API_URL}/api/materiali/${editingId}`, form).then(() => {
         setForm(initialFormState);
         setEditingId(null);
         loadMateriali();
       });
     } else {
-      axios.post(`${API_BASE_URL}0/api/materiali`, form).then(() => {
+      axios.post(`${API_URL}/api/materiali`, form).then(() => {
         setForm(initialFormState);
         loadMateriali();
       });
@@ -70,7 +69,7 @@ export default function MaterialiForm() {
 
   function handleDelete(id) {
     if (window.confirm("Vuoi cancellare questo materiale?")) {
-      axios.delete(`${API_BASE_URL}/api/materiali/${id}`).then(loadMateriali);
+      axios.delete(`${API_URL}/api/materiali/${id}`).then(loadMateriali);
       if (editingId === id) {
         setEditingId(null);
         setForm(initialFormState);
