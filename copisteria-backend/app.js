@@ -8,12 +8,12 @@ import {
   TipoMateriale,
   FormatoMateriale,
 } from "./models/index.js";
-import materialiRoutes from "./routes/materiali.js";
-import lavorazioniRoutes from "./routes/lavorazioni.js";
-import lookupRoutes from "./routes/lookup.js";
-import clientiRoutes from "./routes/clienti.js";
-import preventiviRouter from "./routes/preventivi.js";
-import ordiniRoutes from "./routes/ordini.js";
+import materialiRoutes from "./api/materiali.js";
+import lavorazioniRoutes from "./api/lavorazioni.js";
+import lookupRoutes from "./api/lookup.js";
+import clientiRoutes from "./api/clienti.js";
+import preventiviRouter from "./pi/preventivi.js";
+import ordiniRoutes from "./api/ordini.js";
 
 dotenv.config();
 
