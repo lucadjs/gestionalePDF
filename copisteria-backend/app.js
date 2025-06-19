@@ -7,13 +7,13 @@ import {
   Supporto,
   TipoMateriale,
   FormatoMateriale,
-} from "../models/index.js";
-import materialiRoutes from "./materiali.js";
-import lavorazioniRoutes from "./lavorazioni.js";
-import lookupRoutes from "./lookup.js";
-import clientiRoutes from "./clienti.js";
-import preventiviRouter from "../pi/preventivi.js";
-import ordiniRoutes from "./ordini.js";
+} from "./models/index.js";
+import materialiRoutes from "./api/materiali.js";
+import lavorazioniRoutes from "./api/lavorazioni.js";
+import lookupRoutes from "./api/lookup.js";
+import clientiRoutes from "./api/clienti.js";
+import preventiviRouter from "./api/preventivi.js";
+import ordiniRoutes from "./api/ordini.js";
 
 dotenv.config();
 
@@ -92,13 +92,9 @@ async function populateLookup() {
   );
 }
 
-// Funzione handler per Vercel
-export default async function handler(req, res) {
-  // Assicura che il DB sia sincronizzato e popolato solo una volta
-  if (!global._sequelizeSynced) {
-    await sequelize.sync();
-    await populateLookup();
-    global._sequelizeSynced = true;
-  }
-  app(req, res);
-}
+sequelize.sync().then(async () => {
+  await populateLookup();
+  app.listen(process.env.PORT || 4000, () => {
+    console.log("Server avviato sulla porta", process.env.PORT || 4000);
+  });
+});
