@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-const API_BASE_URL = import.meta.env.VITE_API_URL || ""; // se backend su Vercel puoi lasciare ""
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
 const initialFormState = {
   tipo_id: "",
@@ -22,7 +22,6 @@ export default function LavorazioniForm() {
   const [filtro, setFiltro] = useState("");
 
   useEffect(() => {
-    // CAMBIA: ora la lookup è una sola route con type
     axios
       .get(`${API_BASE_URL}/api/lookup/tipi_lavorazione`)
       .then((res) => setTipiLav(res.data));
@@ -45,9 +44,8 @@ export default function LavorazioniForm() {
   function handleSubmit(e) {
     e.preventDefault();
     if (editingId) {
-      // id in querystring!
       axios
-        .put(`${API_BASE_URL}/api/lavorazioni?id=${editingId}`, form)
+        .put(`${API_BASE_URL}/api/lavorazioni/${editingId}`, form)
         .then(() => {
           setForm(initialFormState);
           setEditingId(null);
@@ -68,9 +66,8 @@ export default function LavorazioniForm() {
 
   function handleDelete(id) {
     if (window.confirm("Vuoi cancellare questa lavorazione?")) {
-      // id in querystring!
       axios
-        .delete(`${API_BASE_URL}/api/lavorazioni?id=${id}`)
+        .delete(`${API_BASE_URL}/api/lavorazioni/${id}`)
         .then(loadLavorazioni);
       if (editingId === id) {
         setEditingId(null);
