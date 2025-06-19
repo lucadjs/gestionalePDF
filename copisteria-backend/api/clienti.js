@@ -8,7 +8,7 @@ export default async function handler(req, res) {
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
     });
-    const [rows] = await connection.query("SELECT * FROM clienti");
+    const [rows] = await connection.query("SELECT * FROM clientes");
     await connection.end();
     res.status(200).json(rows);
   } catch (error) {
