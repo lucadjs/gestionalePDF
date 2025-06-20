@@ -2,7 +2,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.vfs;
 
-export function esportaPreventivoPDF({ dati, righe, logoDataUrl }) {
+export function esportaPreventivoPDFEmail({ dati, righe, logoDataUrl }) {
   const tableBody = [
     [
       { text: "Descrizione", style: "tableHeader", fillColor: "#FF6600" },
@@ -175,7 +175,5 @@ export function esportaPreventivoPDF({ dati, righe, logoDataUrl }) {
     pageMargins: [40, 50, 40, 60],
   };
 
-  return pdfMake
-    .createPdf(docDefinition)
-    .download(`CopisteriaPDF-Preventivo n° ${dati.codice || ""}.pdf`);
+  return pdfMake.createPdf(docDefinition);
 }

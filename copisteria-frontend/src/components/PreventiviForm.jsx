@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL || "";
-
-import { esportaPreventivoPDF } from "../utils/pdfPreventivo";
+import { esportaPreventivoPDF } from "../utils/pdfPreventivo"; // non modificare questo file!
+import { esportaPreventivoPDFEmail } from "../utils/emailPreventivo";
 import {
   FaFilePdf,
   FaEdit,
   FaCheckCircle,
   FaTrash,
   FaEnvelope,
+  FaCopy,
 } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 
-// Utility: prende logo da upload, o da /public/logo.png
+const API_URL = import.meta.env.VITE_API_URL || "";
+const ALIQUOTA_IVA = 0.22;
+
 async function getLogoDataUrl(logoDataUrl) {
   if (logoDataUrl) return logoDataUrl;
   const res = await fetch("/logo.png");
@@ -24,8 +25,6 @@ async function getLogoDataUrl(logoDataUrl) {
     reader.readAsDataURL(blob);
   });
 }
-
-const ALIQUOTA_IVA = 0.22;
 
 export default function PreventiviForm() {
   const [clienti, setClienti] = useState([]);
@@ -45,6 +44,7 @@ export default function PreventiviForm() {
   const [logoDataUrl, setLogoDataUrl] = useState();
   const [ultimoPreventivoId, setUltimoPreventivoId] = useState(null);
   const [ricerca, setRicerca] = useState("");
+  const [editId, setEditId] = useState(null);
   const ragioneSociale = "Copisteria PDF";
   const ragioneSociale1 = "di Daniele Denaci";
   const indirizzoAzienda = "Via Messina 40A";
@@ -153,19 +153,38 @@ export default function PreventiviForm() {
         descrizione: r.descrizione || (lav ? lav.descrizione : ""),
       };
     });
-    axios
-      .post(`${API_URL}/api/preventivi`, {
-        ...form,
-        totale: totaleIvato,
-        righe: righeCompilate,
-      })
-      .then((res) => {
-        setForm({ clienteId: "", data: "", note: "" });
-        setRighe([]);
-        setUltimoPreventivoId(res.data.id);
-        loadPreventivi();
-        toast.success("Preventivo salvato!");
-      });
+    if (editId) {
+      // Modifica
+      axios
+        .put(`${API_URL}/api/preventivi/${editId}`, {
+          ...form,
+          totale: totaleIvato,
+          righe: righeCompilate,
+        })
+        .then(() => {
+          setForm({ clienteId: "", data: "", note: "" });
+          setRighe([]);
+          setEditId(null);
+          setUltimoPreventivoId(null);
+          loadPreventivi();
+          toast.success("Preventivo modificato!");
+        });
+    } else {
+      // Inserisci nuovo
+      axios
+        .post(`${API_URL}/api/preventivi`, {
+          ...form,
+          totale: totaleIvato,
+          righe: righeCompilate,
+        })
+        .then((res) => {
+          setForm({ clienteId: "", data: "", note: "" });
+          setRighe([]);
+          setUltimoPreventivoId(res.data.id);
+          loadPreventivi();
+          toast.success("Preventivo salvato!");
+        });
+    }
   }
 
   async function esportaPDF(preventivo, righePreventivo) {
@@ -234,23 +253,123 @@ export default function PreventiviForm() {
     }
   }
 
-  async function handleSendEmail(preventivo) {
-    if (
-      window.confirm("Vuoi inviare il preventivo via email al cliente ora?")
-    ) {
-      await axios.post(`${API_URL}/api/preventivi/${preventivo.id}/email`);
-      toast.success("Email inviata!");
-    }
+  async function inviaEmailPDF(preventivo, righePreventivo) {
+    if (!window.confirm("Vuoi inviare il PDF di questo preventivo via email?"))
+      return;
+    const righePDF = (righePreventivo || []).map((r) => {
+      const lav = lavorazioni.find((l) => l.id === parseInt(r.lavorazioneId));
+      return {
+        ...r,
+        descrizione: r.descrizione || (lav ? lav.descrizione : ""),
+        unita_misura: r.unita_misura || (lav ? lav.unita_misura : ""),
+      };
+    });
+    const cliente = clienti.find((c) => c.id === preventivo.clienteId) || {};
+    const logo = await getLogoDataUrl(logoDataUrl);
+
+    // --- Genera PDF in base64 ---
+    return new Promise((resolve, reject) => {
+      esportaPreventivoPDFEmail(
+        {
+          dati: {
+            ragioneSociale,
+            ragioneSociale1,
+            indirizzo: indirizzoAzienda,
+            citta: cittaAzienda,
+            telefono,
+            sito,
+            email,
+            destinatario: cliente.nomeAzienda || cliente.nome || "",
+            destinatario_indirizzo: cliente.indirizzo || "",
+            spedizione: cliente.nomeAzienda || cliente.nome || "",
+            spedizione_indirizzo: cliente.indirizzo || "",
+            data: preventivo.data,
+            codice: preventivo.id,
+            subtotale: preventivo.totale / 1.22,
+            iva: preventivo.totale - preventivo.totale / 1.22,
+            totale: preventivo.totale,
+            termini:
+              "Il presente preventivo ha una validità di 30 gg.\nPagamento alla consegna.",
+          },
+          righe: righePDF,
+          logoDataUrl: logo,
+        },
+        true // pass true for "return base64" se la tua funzione lo prevede, sennò vedi sotto!
+      ).getBase64(async (base64) => {
+        // Chiamata POST verso il backend
+        await axios.post(`${API_URL}/api/preventivi/${preventivo.id}/email`, {
+          to: cliente.email,
+          subject: `Copisteria PDF Preventivo n° ${preventivo.id}`,
+          text: `Buongiorno ${
+            cliente.nome || cliente.nomeAzienda
+          }, in allegato trova il preventivo richiesto.\nCordiali saluti,\nCopisteria PDF`,
+          pdfBase64: base64,
+        });
+        toast.success("Email inviata al cliente!");
+        resolve();
+      });
+    });
   }
 
-  function handleEdit(preventivo) {
-    if (
-      window.confirm(
-        "Attenzione: la funzione modifica/duplicazione non è ancora implementata. Vuoi continuare?"
-      )
-    ) {
-      toast.info("Funzione in sviluppo!");
-    }
+  // MODIFICA: SOLO se non convertito!
+  async function handleEdit(preventivo) {
+    if (isConverted(preventivo)) return; // Sicurezza doppia
+    const resp = await axios.get(`${API_URL}/api/preventivi/${preventivo.id}`);
+    setEditId(preventivo.id);
+    setUltimoPreventivoId(preventivo.id);
+    setForm({
+      clienteId: preventivo.clienteId,
+      data: preventivo.data?.slice(0, 10) || "",
+      note: preventivo.note || "",
+    });
+    setRighe(
+      (resp.data.righe || []).map((r) => ({
+        ...r,
+        lavorazioneId: r.lavorazioneId || "",
+        descrizione: r.descrizione || "",
+        quantita: r.quantita,
+        prezzo_unitario: r.prezzo_unitario,
+        totale_riga: r.totale_riga,
+        note: r.note || "",
+        unita_misura: r.unita_misura || "",
+      }))
+    );
+    toast.info("Puoi modificare il preventivo, poi salva per confermare!");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // DUPLICA: SEMPRE ATTIVO!
+  async function handleDuplica(preventivo) {
+    if (!window.confirm("Vuoi duplicare questo preventivo?")) return;
+    const res = await axios.post(
+      `${API_URL}/api/preventivi/${preventivo.id}/duplica`
+    );
+    // Carica il nuovo preventivo duplicato per modifica immediata!
+    const newId = res.data.id;
+    const resp = await axios.get(`${API_URL}/api/preventivi/${newId}`);
+    setEditId(newId);
+    setUltimoPreventivoId(newId);
+    setForm({
+      clienteId: resp.data.clienteId,
+      data: resp.data.data?.slice(0, 10) || "",
+      note: resp.data.note || "",
+    });
+    setRighe(
+      (resp.data.righe || []).map((r) => ({
+        ...r,
+        lavorazioneId: r.lavorazioneId || "",
+        descrizione: r.descrizione || "",
+        quantita: r.quantita,
+        prezzo_unitario: r.prezzo_unitario,
+        totale_riga: r.totale_riga,
+        note: r.note || "",
+        unita_misura: r.unita_misura || "",
+      }))
+    );
+    toast.info(
+      "Duplicato creato: puoi modificarlo e salvare come nuovo preventivo!"
+    );
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   // Ricerca filtro live
@@ -270,7 +389,7 @@ export default function PreventiviForm() {
     return searchStr.includes(ricerca.toLowerCase());
   });
 
-  // Funzione di controllo: preventivo già convertito in ordine?
+  // Preventivo già convertito in ordine?
   function isConverted(p) {
     return (p.note || "").toLowerCase().includes("convertito in ordine n");
   }
@@ -278,8 +397,8 @@ export default function PreventiviForm() {
   return (
     <div>
       <ToastContainer />
-      <h2>Nuovo Preventivo</h2>
-      {/* --- Form Nuovo Preventivo --- */}
+      <h2>{editId ? "Modifica/Duplica Preventivo" : "Nuovo Preventivo"}</h2>
+      {/* --- Form Nuovo/Modifica Preventivo --- */}
       <form
         onSubmit={handleSubmit}
         style={{ display: "flex", flexWrap: "wrap", gap: 8 }}
@@ -310,8 +429,23 @@ export default function PreventiviForm() {
           style={{ flex: 1 }}
         />
         <button type="submit" disabled={righe.length === 0 || !form.clienteId}>
-          Salva preventivo
+          {editId ? "Salva Modifiche" : "Salva Preventivo"}
         </button>
+        {editId && (
+          <button
+            type="button"
+            style={{ marginLeft: 8 }}
+            onClick={() => {
+              setEditId(null);
+              setForm({ clienteId: "", data: "", note: "" });
+              setRighe([]);
+              setUltimoPreventivoId(null);
+              toast.info("Inserimento nuovo preventivo ripristinato.");
+            }}
+          >
+            Annulla modifica
+          </button>
+        )}
       </form>
       <hr />
       <h3>Aggiungi lavorazione</h3>
@@ -385,20 +519,23 @@ export default function PreventiviForm() {
             esportaPDF(
               {
                 ...form,
-                id: ultimoPreventivoId,
+                id: ultimoPreventivoId || editId,
                 totale: totaleIvato,
                 data: form.data,
+                clienteId: form.clienteId,
               },
               righe
             )
           }
-          disabled={righe.length === 0 || !ultimoPreventivoId}
+          disabled={righe.length === 0 || !(ultimoPreventivoId || editId)}
           style={{
             cursor:
-              righe.length === 0 || !ultimoPreventivoId ? "default" : "pointer",
+              righe.length === 0 || !(ultimoPreventivoId || editId)
+                ? "default"
+                : "pointer",
           }}
           title={
-            !ultimoPreventivoId
+            !(ultimoPreventivoId || editId)
               ? "Salva prima il preventivo per PDF col numero reale"
               : "Esporta PDF"
           }
@@ -516,8 +653,21 @@ export default function PreventiviForm() {
                 <td>{p.totale} €</td>
                 <td>{p.note}</td>
                 <td style={{ display: "flex", gap: 5 }}>
+                  {/* DUPLICA: SEMPRE ATTIVO */}
                   <button
-                    title="Converti in ordine"
+                    title="Duplica"
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleDuplica(p)}
+                  >
+                    <FaCopy color="#ff6600" />
+                  </button>
+                  {/* MODIFICA: Solo se NON convertito */}
+                  <button
+                    title="Modifica"
                     style={{
                       background: "none",
                       border: "none",
@@ -525,18 +675,7 @@ export default function PreventiviForm() {
                       opacity: isConverted(p) ? 0.4 : 1,
                     }}
                     disabled={isConverted(p)}
-                    onClick={() => !isConverted(p) && handleConvertiOrdine(p)}
-                  >
-                    <FaCheckCircle color="#ff6600" />
-                  </button>
-                  <button
-                    title="Modifica/duplica"
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleEdit(p)}
+                    onClick={() => !isConverted(p) && handleEdit(p)}
                   >
                     <FaEdit color="#ff6600" />
                   </button>
@@ -550,6 +689,20 @@ export default function PreventiviForm() {
                     onClick={() => handleDelete(p)}
                   >
                     <FaTrash color="red" />
+                  </button>
+                  {/* CONVERTI: Solo se NON convertito */}
+                  <button
+                    title="Converti in ordine"
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: isConverted(p) ? "not-allowed" : "pointer",
+                      opacity: isConverted(p) ? 0.4 : 1,
+                    }}
+                    disabled={isConverted(p)}
+                    onClick={() => !isConverted(p) && handleConvertiOrdine(p)}
+                  >
+                    <FaCheckCircle color="#ff6600" />
                   </button>
                   <button
                     title="Esporta PDF"
@@ -574,7 +727,12 @@ export default function PreventiviForm() {
                       border: "none",
                       cursor: "pointer",
                     }}
-                    onClick={() => handleSendEmail(p)}
+                    onClick={async () => {
+                      const resp = await axios.get(
+                        `${API_URL}/api/preventivi/${p.id}`
+                      );
+                      await inviaEmailPDF(p, resp.data.righe);
+                    }}
                   >
                     <FaEnvelope color="#ff6600" />
                   </button>

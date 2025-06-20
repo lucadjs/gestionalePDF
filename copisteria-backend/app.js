@@ -18,6 +18,11 @@ import ordiniRoutes from "./api/ordini.js";
 dotenv.config();
 
 const app = express();
+
+// Aumenta limiti per JSON e URL-encoded (fino a 20MB, puoi aumentare se serve)
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ limit: "20mb", extended: true }));
+
 app.use(cors());
 app.use(express.json());
 
