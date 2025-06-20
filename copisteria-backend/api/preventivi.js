@@ -15,6 +15,18 @@ const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
+function formattaDataITA(data = new Date()) {
+  return data
+    .toLocaleString("it-IT", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+    .replace(",", "");
+}
+
 // --- GET lista preventivi (senza righe) ---
 router.get("/", async (req, res) => {
   const list = await Preventivo.findAll({ order: [["id", "DESC"]] });
@@ -198,6 +210,10 @@ Copisteria PDF`;
         },
       ],
     });
+    // Aggiorna note
+    let noteAggiornate = preventivo.note ? preventivo.note + " | " : "";
+    noteAggiornate += `Inviata email in data ${formattaDataITA()}`;
+    await preventivo.update({ note: noteAggiornate });
 
     res.json({ ok: true });
   } catch (err) {
