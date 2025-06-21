@@ -1,15 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { esportaPreventivoPDF } from "../utils/pdfPreventivo"; // non modificare questo file!
-import { esportaPreventivoPDFEmail } from "../utils/emailPreventivo";
-import {
-  FaFilePdf,
-  FaEdit,
-  FaCheckCircle,
-  FaTrash,
-  FaEnvelope,
-  FaCopy,
-} from "react-icons/fa";
+import { esportaOrdinePDF } from "../utils/pdfOrdine"; // Riutilizziamo anche per Ordini
+import { FaFilePdf, FaEdit, FaTrash, FaEnvelope, FaCopy } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
@@ -40,10 +32,10 @@ async function getLogoDataUrl(logoDataUrl) {
   });
 }
 
-export default function PreventiviForm() {
+export default function OrdiniForm() {
   const [clienti, setClienti] = useState([]);
   const [lavorazioni, setLavorazioni] = useState([]);
-  const [preventivi, setPreventivi] = useState([]);
+  const [ordini, setOrdini] = useState([]);
   const [righe, setRighe] = useState([]);
   const [form, setForm] = useState({ clienteId: "", data: "", note: "" });
   const [riga, setRiga] = useState({
@@ -56,9 +48,11 @@ export default function PreventiviForm() {
     note: "",
   });
   const [logoDataUrl, setLogoDataUrl] = useState();
-  const [ultimoPreventivoId, setUltimoPreventivoId] = useState(null);
+  const [ultimoOrdineId, setUltimoOrdineId] = useState(null);
   const [ricerca, setRicerca] = useState("");
   const [editId, setEditId] = useState(null);
+
+  // Dati azienda
   const ragioneSociale = "Copisteria PDF";
   const ragioneSociale1 = "di Daniele Denaci";
   const indirizzoAzienda = "Via Messina 40A";
@@ -72,13 +66,11 @@ export default function PreventiviForm() {
     axios
       .get(`${API_URL}/api/lavorazioni`)
       .then((res) => setLavorazioni(res.data));
-    loadPreventivi();
+    loadOrdini();
   }, []);
 
-  function loadPreventivi() {
-    axios
-      .get(`${API_URL}/api/preventivi`)
-      .then((res) => setPreventivi(res.data));
+  function loadOrdini() {
+    axios.get(`${API_URL}/api/ordini`).then((res) => setOrdini(res.data));
   }
 
   function handleFormChange(e) {
@@ -135,7 +127,7 @@ export default function PreventiviForm() {
   function removeRiga(idx) {
     if (
       window.confirm(
-        "Vuoi davvero eliminare questa riga dal preventivo in compilazione?"
+        "Vuoi davvero eliminare questa riga dall’ordine in compilazione?"
       )
     ) {
       setRighe(righe.filter((_, i) => i !== idx));
@@ -168,9 +160,8 @@ export default function PreventiviForm() {
       };
     });
     if (editId) {
-      // Modifica
       axios
-        .put(`${API_URL}/api/preventivi/${editId}`, {
+        .put(`${API_URL}/api/ordini/${editId}`, {
           ...form,
           totale: totaleIvato,
           righe: righeCompilate,
@@ -179,14 +170,13 @@ export default function PreventiviForm() {
           setForm({ clienteId: "", data: "", note: "" });
           setRighe([]);
           setEditId(null);
-          setUltimoPreventivoId(null);
-          loadPreventivi();
-          toast.success("Preventivo modificato!");
+          setUltimoOrdineId(null);
+          loadOrdini();
+          toast.success("Ordine modificato!");
         });
     } else {
-      // Inserisci nuovo
       axios
-        .post(`${API_URL}/api/preventivi`, {
+        .post(`${API_URL}/api/ordini`, {
           ...form,
           totale: totaleIvato,
           righe: righeCompilate,
@@ -194,19 +184,17 @@ export default function PreventiviForm() {
         .then((res) => {
           setForm({ clienteId: "", data: "", note: "" });
           setRighe([]);
-          setUltimoPreventivoId(res.data.id);
-          loadPreventivi();
-          toast.success("Preventivo salvato!");
+          setUltimoOrdineId(res.data.id);
+          loadOrdini();
+          toast.success("Ordine salvato!");
         });
     }
   }
 
-  async function esportaPDF(preventivo, righePreventivo) {
-    if (
-      !window.confirm("Vuoi generare ed esportare il PDF di questo preventivo?")
-    )
+  async function esportaPDF(ordine, righeOrdine) {
+    if (!window.confirm("Vuoi generare ed esportare il PDF di questo ordine?"))
       return;
-    const righePDF = (righePreventivo || []).map((r) => {
+    const righePDF = (righeOrdine || []).map((r) => {
       const lav = lavorazioni.find((l) => l.id === parseInt(r.lavorazioneId));
       return {
         ...r,
@@ -214,10 +202,9 @@ export default function PreventiviForm() {
         unita_misura: r.unita_misura || (lav ? lav.unita_misura : ""),
       };
     });
-    const cliente = clienti.find((c) => c.id === preventivo.clienteId) || {};
-    // Ottieni il logo in base64 (upload o /logo.png)
+    const cliente = clienti.find((c) => c.id === ordine.clienteId) || {};
     const logo = await getLogoDataUrl(logoDataUrl);
-    esportaPreventivoPDF({
+    esportaOrdinePDF({
       dati: {
         ragioneSociale,
         ragioneSociale1,
@@ -230,111 +217,36 @@ export default function PreventiviForm() {
         destinatario_indirizzo: cliente.indirizzo || "",
         spedizione: cliente.nomeAzienda || cliente.nome || "",
         spedizione_indirizzo: cliente.indirizzo || "",
-        data: preventivo.data,
-        codice: preventivo.id,
-        subtotale: preventivo.totale / 1.22,
-        iva: preventivo.totale - preventivo.totale / 1.22,
-        totale: preventivo.totale,
-        termini:
-          "Il presente preventivo ha una validità di 30 gg.\nPagamento alla consegna.",
+        data: ordine.data,
+        codice: ordine.id,
+        subtotale: ordine.totale / 1.22,
+        iva: ordine.totale - ordine.totale / 1.22,
+        totale: ordine.totale,
+        termini: "Il presente ordine sarà evaso secondo i termini pattuiti.",
       },
       righe: righePDF,
       logoDataUrl: logo,
     });
   }
 
-  async function handleDelete(preventivo) {
+  async function handleDelete(ordine) {
     if (
-      window.confirm(
-        "Vuoi davvero cancellare definitivamente questo preventivo?"
-      )
+      window.confirm("Vuoi davvero cancellare definitivamente questo ordine?")
     ) {
-      await axios.delete(`${API_URL}/api/preventivi/${preventivo.id}`);
-      toast.info("Preventivo eliminato!");
-      loadPreventivi();
+      await axios.delete(`${API_URL}/api/ordini/${ordine.id}`);
+      toast.info("Ordine eliminato!");
+      loadOrdini();
     }
   }
 
-  async function handleConvertiOrdine(preventivo) {
-    if (
-      window.confirm(
-        "Confermi la conversione di questo preventivo in ordine?\nNon sarà più possibile riconvertirlo."
-      )
-    ) {
-      await axios.post(`${API_URL}/api/preventivi/${preventivo.id}/converti`);
-      toast.success("Preventivo convertito in ordine!");
-      loadPreventivi();
-    }
-  }
-
-  async function inviaEmailPDF(preventivo, righePreventivo) {
-    if (!window.confirm("Vuoi inviare il PDF di questo preventivo via email?"))
-      return;
-    const righePDF = (righePreventivo || []).map((r) => {
-      const lav = lavorazioni.find((l) => l.id === parseInt(r.lavorazioneId));
-      return {
-        ...r,
-        descrizione: r.descrizione || (lav ? lav.descrizione : ""),
-        unita_misura: r.unita_misura || (lav ? lav.unita_misura : ""),
-      };
-    });
-    const cliente = clienti.find((c) => c.id === preventivo.clienteId) || {};
-    const logo = await getLogoDataUrl(logoDataUrl);
-
-    // --- Genera PDF in base64 ---
-    return new Promise((resolve, reject) => {
-      esportaPreventivoPDFEmail(
-        {
-          dati: {
-            ragioneSociale,
-            ragioneSociale1,
-            indirizzo: indirizzoAzienda,
-            citta: cittaAzienda,
-            telefono,
-            sito,
-            email,
-            destinatario: cliente.nomeAzienda || cliente.nome || "",
-            destinatario_indirizzo: cliente.indirizzo || "",
-            spedizione: cliente.nomeAzienda || cliente.nome || "",
-            spedizione_indirizzo: cliente.indirizzo || "",
-            data: preventivo.data,
-            codice: preventivo.id,
-            subtotale: preventivo.totale / 1.22,
-            iva: preventivo.totale - preventivo.totale / 1.22,
-            totale: preventivo.totale,
-            termini:
-              "Il presente preventivo ha una validità di 30 gg.\nPagamento alla consegna.",
-          },
-          righe: righePDF,
-          logoDataUrl: logo,
-        },
-        true // pass true for "return base64" se la tua funzione lo prevede, sennò vedi sotto!
-      ).getBase64(async (base64) => {
-        // Chiamata POST verso il backend
-        await axios.post(`${API_URL}/api/preventivi/${preventivo.id}/email`, {
-          to: cliente.email,
-          subject: `Copisteria PDF Preventivo n° ${preventivo.id}`,
-          text: `Buongiorno ${
-            cliente.nome || cliente.nomeAzienda
-          }, in allegato trova il preventivo richiesto.\nCordiali saluti,\nCopisteria PDF`,
-          pdfBase64: base64,
-        });
-        toast.success("Email inviata al cliente!");
-        resolve();
-      });
-    });
-  }
-
-  // MODIFICA: SOLO se non convertito!
-  async function handleEdit(preventivo) {
-    if (isConverted(preventivo)) return; // Sicurezza doppia
-    const resp = await axios.get(`${API_URL}/api/preventivi/${preventivo.id}`);
-    setEditId(preventivo.id);
-    setUltimoPreventivoId(preventivo.id);
+  async function handleEdit(ordine) {
+    const resp = await axios.get(`${API_URL}/api/ordini/${ordine.id}`);
+    setEditId(ordine.id);
+    setUltimoOrdineId(ordine.id);
     setForm({
-      clienteId: preventivo.clienteId,
-      data: preventivo.data?.slice(0, 10) || "",
-      note: preventivo.note || "",
+      clienteId: ordine.clienteId,
+      data: ordine.data?.slice(0, 10) || "",
+      note: ordine.note || "",
     });
     setRighe(
       (resp.data.righe || []).map((r) => ({
@@ -348,52 +260,18 @@ export default function PreventiviForm() {
         unita_misura: r.unita_misura || "",
       }))
     );
-    toast.info("Puoi modificare il preventivo, poi salva per confermare!");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  // DUPLICA: SEMPRE ATTIVO!
-  async function handleDuplica(preventivo) {
-    if (!window.confirm("Vuoi duplicare questo preventivo?")) return;
-    const res = await axios.post(
-      `${API_URL}/api/preventivi/${preventivo.id}/duplica`
-    );
-    // Carica il nuovo preventivo duplicato per modifica immediata!
-    const newId = res.data.id;
-    const resp = await axios.get(`${API_URL}/api/preventivi/${newId}`);
-    setEditId(newId);
-    setUltimoPreventivoId(newId);
-    setForm({
-      clienteId: resp.data.clienteId,
-      data: resp.data.data?.slice(0, 10) || "",
-      note: resp.data.note || "",
-    });
-    setRighe(
-      (resp.data.righe || []).map((r) => ({
-        ...r,
-        lavorazioneId: r.lavorazioneId || "",
-        descrizione: r.descrizione || "",
-        quantita: r.quantita,
-        prezzo_unitario: r.prezzo_unitario,
-        totale_riga: r.totale_riga,
-        note: r.note || "",
-        unita_misura: r.unita_misura || "",
-      }))
-    );
-    toast.info(
-      "Duplicato creato: puoi modificarlo e salvare come nuovo preventivo!"
-    );
+    toast.info("Modifica l'ordine e salva per confermare!");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   // Ricerca filtro live
-  const preventiviFiltrati = preventivi.filter((p) => {
-    const cliente = clienti.find((c) => c.id === p.clienteId);
+  const ordiniFiltrati = ordini.filter((o) => {
+    const cliente = clienti.find((c) => c.id === o.clienteId);
     const searchStr = [
-      p.id,
-      p.data,
-      p.totale,
-      p.note,
+      o.id,
+      o.data,
+      o.totale,
+      o.note,
       cliente?.nomeAzienda,
       cliente?.nome,
       cliente?.email,
@@ -403,16 +281,11 @@ export default function PreventiviForm() {
     return searchStr.includes(ricerca.toLowerCase());
   });
 
-  // Preventivo già convertito in ordine?
-  function isConverted(p) {
-    return (p.note || "").toLowerCase().includes("convertito in ordine n");
-  }
-
   return (
     <div>
       <ToastContainer />
-      <h2>{editId ? "Modifica/Duplica Preventivo" : "Nuovo Preventivo"}</h2>
-      {/* --- Form Nuovo/Modifica Preventivo --- */}
+      <h2>{editId ? "Modifica Ordine" : "Nuovo Ordine"}</h2>
+      {/* --- Form Nuovo/Modifica Ordine --- */}
       <form
         onSubmit={handleSubmit}
         style={{ display: "flex", flexWrap: "wrap", gap: 8 }}
@@ -443,7 +316,7 @@ export default function PreventiviForm() {
           style={{ flex: 1 }}
         />
         <button type="submit" disabled={righe.length === 0 || !form.clienteId}>
-          {editId ? "Salva Modifiche" : "Salva Preventivo"}
+          {editId ? "Salva Modifiche" : "Salva Ordine"}
         </button>
         {editId && (
           <button
@@ -453,8 +326,8 @@ export default function PreventiviForm() {
               setEditId(null);
               setForm({ clienteId: "", data: "", note: "" });
               setRighe([]);
-              setUltimoPreventivoId(null);
-              toast.info("Inserimento nuovo preventivo ripristinato.");
+              setUltimoOrdineId(null);
+              toast.info("Inserimento nuovo ordine ripristinato.");
             }}
           >
             Annulla modifica
@@ -511,10 +384,6 @@ export default function PreventiviForm() {
           type="button"
           onClick={addRiga}
           disabled={!riga.lavorazioneId || !riga.quantita}
-          style={{
-            cursor:
-              !riga.lavorazioneId || !riga.quantita ? "default" : "pointer",
-          }}
         >
           Aggiungi
         </button>
@@ -526,14 +395,13 @@ export default function PreventiviForm() {
           onChange={handleLogoChange}
           style={{ marginRight: 16 }}
         />
-        {/* Esporta PDF solo sul preventivo corrente in inserimento */}
         <button
           type="button"
           onClick={() =>
             esportaPDF(
               {
                 ...form,
-                id: ultimoPreventivoId || editId,
+                id: ultimoOrdineId || editId,
                 totale: totaleIvato,
                 data: form.data,
                 clienteId: form.clienteId,
@@ -541,16 +409,16 @@ export default function PreventiviForm() {
               righe
             )
           }
-          disabled={righe.length === 0 || !(ultimoPreventivoId || editId)}
+          disabled={righe.length === 0 || !(ultimoOrdineId || editId)}
           style={{
             cursor:
-              righe.length === 0 || !(ultimoPreventivoId || editId)
+              righe.length === 0 || !(ultimoOrdineId || editId)
                 ? "default"
                 : "pointer",
           }}
           title={
-            !(ultimoPreventivoId || editId)
-              ? "Salva prima il preventivo per PDF col numero reale"
+            !(ultimoOrdineId || editId)
+              ? "Salva prima l’ordine per PDF col numero reale"
               : "Esporta PDF"
           }
         >
@@ -623,10 +491,10 @@ export default function PreventiviForm() {
         IVA 22%: {iva} €<br />
         <span style={{ fontSize: 18 }}>Totale ivato: {totaleIvato} €</span>
       </div>
-      <h3 style={{ marginTop: 30 }}>Preventivi inseriti</h3>
+      <h3 style={{ marginTop: 30 }}>Ordini inseriti</h3>
       <input
         type="text"
-        placeholder="Cerca preventivo per cliente, data, note..."
+        placeholder="Cerca ordine per cliente, data, note..."
         value={ricerca}
         onChange={(e) => setRicerca(e.target.value)}
         style={{ marginBottom: 6, width: 300 }}
@@ -656,43 +524,30 @@ export default function PreventiviForm() {
             </tr>
           </thead>
           <tbody>
-            {preventiviFiltrati.map((p) => (
-              <tr key={p.id}>
-                <td>{p.id}</td>
+            {ordiniFiltrati.map((o) => (
+              <tr key={o.id}>
+                <td>{o.id}</td>
                 <td>
-                  {clienti.find((c) => c.id === p.clienteId)?.nomeAzienda ||
-                    clienti.find((c) => c.id === p.clienteId)?.nome}
+                  {clienti.find((c) => c.id === o.clienteId)?.nomeAzienda ||
+                    clienti.find((c) => c.id === o.clienteId)?.nome}
                 </td>
-                <td>{formattaDataIt(p.data)}</td>
-                <td>{p.totale} €</td>
-                <td>{p.note}</td>
+                <td>{formattaDataIt(o.data)}</td>
+                <td>{o.totale} €</td>
+                <td>{o.note}</td>
                 <td style={{ display: "flex", gap: 5 }}>
-                  {/* DUPLICA: SEMPRE ATTIVO */}
-                  <button
-                    title="Duplica"
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleDuplica(p)}
-                  >
-                    <FaCopy color="#ff6600" />
-                  </button>
-                  {/* MODIFICA: Solo se NON convertito */}
+                  {/* MODIFICA */}
                   <button
                     title="Modifica"
                     style={{
                       background: "none",
                       border: "none",
-                      cursor: isConverted(p) ? "not-allowed" : "pointer",
-                      opacity: isConverted(p) ? 0.4 : 1,
+                      cursor: "pointer",
                     }}
-                    disabled={isConverted(p)}
-                    onClick={() => !isConverted(p) && handleEdit(p)}
+                    onClick={() => handleEdit(o)}
                   >
                     <FaEdit color="#ff6600" />
                   </button>
+                  {/* CANCELLA */}
                   <button
                     title="Cancella"
                     style={{
@@ -700,24 +555,11 @@ export default function PreventiviForm() {
                       border: "none",
                       cursor: "pointer",
                     }}
-                    onClick={() => handleDelete(p)}
+                    onClick={() => handleDelete(o)}
                   >
                     <FaTrash color="red" />
                   </button>
-                  {/* CONVERTI: Solo se NON convertito */}
-                  <button
-                    title="Converti in ordine"
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: isConverted(p) ? "not-allowed" : "pointer",
-                      opacity: isConverted(p) ? 0.4 : 1,
-                    }}
-                    disabled={isConverted(p)}
-                    onClick={() => !isConverted(p) && handleConvertiOrdine(p)}
-                  >
-                    <FaCheckCircle color="#ff6600" />
-                  </button>
+                  {/* PDF */}
                   <button
                     title="Esporta PDF"
                     style={{
@@ -727,29 +569,18 @@ export default function PreventiviForm() {
                     }}
                     onClick={async () => {
                       const resp = await axios.get(
-                        `${API_URL}/api/preventivi/${p.id}`
+                        `${API_URL}/api/ordini/${o.id}`
                       );
-                      await esportaPDF(p, resp.data.righe);
+                      await esportaPDF(o, resp.data.righe);
                     }}
                   >
                     <FaFilePdf color="#ff6600" />
                   </button>
-                  <button
-                    title="Invia email"
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                    }}
-                    onClick={async () => {
-                      const resp = await axios.get(
-                        `${API_URL}/api/preventivi/${p.id}`
-                      );
-                      await inviaEmailPDF(p, resp.data.righe);
-                    }}
-                  >
-                    <FaEnvelope color="#ff6600" />
-                  </button>
+                  {/* DUPLICA (se vuoi, puoi aggiungerla come per i preventivi) */}
+                  {/* <button ... >
+                      <FaCopy color="#ff6600" />
+                  </button> */}
+                  {/* Email: puoi implementare se vuoi il flusso anche per ordine */}
                 </td>
               </tr>
             ))}

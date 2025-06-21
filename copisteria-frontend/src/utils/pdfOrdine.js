@@ -16,7 +16,7 @@ function formattaDataIt(data) {
     .replace(/\//g, "/");
 }
 
-export function esportaPreventivoPDF({ dati, righe, logoDataUrl }) {
+export function esportaOrdinePDF({ dati, righe, logoDataUrl }) {
   const tableBody = [
     [
       { text: "Descrizione", style: "tableHeader", fillColor: "#FF6600" },
@@ -71,7 +71,7 @@ export function esportaPreventivoPDF({ dati, righe, logoDataUrl }) {
             { text: "Data", color: "#ff6600", style: "minihead" },
             { text: formattaDataIt(dati.data), style: "small" },
             {
-              text: "Prev. n° " + (dati.codice || ""),
+              text: "Ordine n° " + (dati.codice || ""),
               style: "minihead",
               color: "#ff6600",
               margin: [0, 6, 0, 0],
@@ -189,5 +189,5 @@ export function esportaPreventivoPDF({ dati, righe, logoDataUrl }) {
 
   return pdfMake
     .createPdf(docDefinition)
-    .download(`CopisteriaPDF-Preventivo n° ${dati.codice || ""}.pdf`);
+    .download(`CopisteriaPDF-Ordine n° ${dati.codice || ""}.pdf`);
 }

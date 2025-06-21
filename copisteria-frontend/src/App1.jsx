@@ -3,12 +3,14 @@ import MaterialiForm from "./components/MaterialiForm";
 import LavorazioniForm from "./components/LavorazioniForm";
 import ClientiForm from "./components/ClientiForm";
 import PreventiviForm from "./components/PreventiviForm";
+import OrdiniForm from "./components/OrdiniForm";
 
 const BUTTONS = [
   { key: "clienti", label: "Clienti" },
   { key: "materiali", label: "Materiali" },
   { key: "lavorazioni", label: "Lavorazioni" },
   { key: "preventivi", label: "Preventivi" },
+  { key: "ordini", label: "Ordini" },
 ];
 
 export default function App() {
@@ -44,6 +46,7 @@ export default function App() {
         {sezione === "materiali" && <MaterialiForm />}
         {sezione === "lavorazioni" && <LavorazioniForm />}
         {sezione === "preventivi" && <PreventiviForm />}
+        {sezione === "ordini" && <OrdiniForm />}
       </div>
     </div>
   );
