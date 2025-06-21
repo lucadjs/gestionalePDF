@@ -10,22 +10,16 @@ import nodemailer from "nodemailer";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { format, utcToZonedTime } from "date-fns-tz";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
 function formattaDataITA(data = new Date()) {
-  return data
-    .toLocaleString("it-IT", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZone: "Europe/Rome",
-    })
-    .replace(",", "");
+  const timeZone = "Europe/Rome";
+  const zonedDate = utcToZonedTime(data, timeZone);
+  return format(zonedDate, "dd/MM/yyyy HH:mm", { timeZone });
 }
 
 // --- GET lista preventivi (senza righe) ---
