@@ -4,8 +4,10 @@ import LavorazioniForm from "./components/LavorazioniForm";
 import ClientiForm from "./components/ClientiForm";
 import PreventiviForm from "./components/PreventiviForm";
 import OrdiniForm from "./components/OrdiniForm";
+import UtentiForm from "./components/UtentiForm";
 
 const BUTTONS = [
+  { key: "utenti", label: "Utenti" },
   { key: "clienti", label: "Clienti" },
   { key: "materiali", label: "Materiali" },
   { key: "lavorazioni", label: "Lavorazioni" },
@@ -42,6 +44,7 @@ export default function App() {
       </div>
 
       <div>
+        {sezione === "utenti" && <UtentiForm />}
         {sezione === "clienti" && <ClientiForm />}
         {sezione === "materiali" && <MaterialiForm />}
         {sezione === "lavorazioni" && <LavorazioniForm />}

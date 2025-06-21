@@ -1,6 +1,5 @@
 import sequelize from "../config/database.js";
 import { DataTypes } from "sequelize";
-
 // Lookup tables
 const TipoLavorazione = sequelize.define(
   "tipo_lavorazione",
@@ -112,6 +111,23 @@ const Preventivo = sequelize.define(
   { timestamps: false }
 );
 
+// Utenti
+const Utente = sequelize.define(
+  "utente",
+  {
+    nome: { type: DataTypes.STRING, allowNull: false },
+    email: { type: DataTypes.STRING, unique: true, allowNull: false },
+    password_hash: { type: DataTypes.STRING, allowNull: false },
+    ruolo: {
+      type: DataTypes.ENUM("admin", "privato", "azienda", "studente"),
+      allowNull: false,
+      defaultValue: "privato",
+    },
+    attivo: { type: DataTypes.TINYINT, defaultValue: 1 },
+  },
+  { timestamps: false }
+);
+
 // RigaPreventivo
 const RigaPreventivo = sequelize.define(
   "riga_preventivo",
@@ -191,5 +207,6 @@ export {
   RigaPreventivo,
   Ordine,
   RigaOrdine,
+  Utente,
   sequelize,
 };
