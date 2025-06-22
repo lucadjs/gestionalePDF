@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { FaEdit, FaTrash, FaCopy } from "react-icons/fa";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
@@ -74,6 +75,17 @@ export default function ClientiForm() {
     }
   }
 
+  function handleDuplica(cliente) {
+    // Crea un nuovo oggetto senza id e data_registrazione, ultimo_contatto
+    const copia = { ...cliente };
+    delete copia.id;
+    delete copia.data_registrazione;
+    delete copia.ultimo_contatto;
+    setForm(copia);
+    setEditingId(null); // In modalità nuovo inserimento!
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   function handleCancel() {
     setForm(initialFormState);
     setEditingId(null);
@@ -86,6 +98,7 @@ export default function ClientiForm() {
         onSubmit={handleSubmit}
         style={{ display: "flex", flexWrap: "wrap", gap: 8 }}
       >
+        {/* ... (tutti gli input e i campi come già presenti) ... */}
         <select name="categoria" value={form.categoria} onChange={handleChange}>
           <option value="">Categoria</option>
           <option value="a">Azienda</option>
@@ -264,16 +277,45 @@ export default function ClientiForm() {
                   <td>{c.codice_univoco}</td>
                   <td>{c.codice_sconto}</td>
                   <td>{c.note}</td>
-                  <td>
-                    <button type="button" onClick={() => handleEdit(c)}>
-                      Modifica
+                  <td style={{ display: "flex", gap: 8 }}>
+                    <button
+                      type="button"
+                      title="Duplica cliente"
+                      onClick={() => handleDuplica(c)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
+                    >
+                      <FaCopy color="#ff6600" />
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleDelete(c.id)}
-                      style={{ color: "red" }}
+                      title="Modifica"
+                      onClick={() => handleEdit(c)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
                     >
-                      Cancella
+                      <FaEdit color="#ffd700" />
+                    </button>
+                    <button
+                      type="button"
+                      title="Cancella"
+                      onClick={() => handleDelete(c.id)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
+                    >
+                      <FaTrash color="red" />
                     </button>
                   </td>
                 </tr>

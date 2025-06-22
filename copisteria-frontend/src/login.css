@@ -1,0 +1,279 @@
+/* Background pagina */
+body,
+.app-bg {
+  min-height: 100vh;
+  background: #ff6600;
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Box centrale bianco per tutte le sezioni */
+.app-main,
+.login-form,
+.styled-form {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.12);
+  max-width: 760px;
+  margin: 40px auto 0 auto;
+  padding: 30px 28px 22px 28px;
+}
+
+/* Sfondo arancione a tutta pagina */
+.app-bg {
+  min-height: 100vh;
+  background: #ff6600;
+  font-family: "Segoe UI", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Top-bar sticky (resta fissa in alto) */
+.top-bar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 99;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid #eee;
+  padding: 0 0 8px 0;
+}
+
+/* Titolo centrato sopra i bottoni */
+.top-bar-title {
+  margin: 0;
+  padding: 16px 24px 4px 24px;
+  color: #ff6600;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+/* Area bottoni e info utente */
+.top-bar-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px 4px 20px;
+}
+
+/* Bottoni tab */
+.top-bar-btn {
+  background: #eee;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: normal;
+  font-size: 1rem;
+  cursor: pointer;
+  outline: none;
+  box-shadow: none;
+  transition: background 0.18s;
+}
+.top-bar-btn.active {
+  background: #ffd700;
+  font-weight: bold;
+}
+
+/* Logout button */
+.logout-btn {
+  margin-left: 8px;
+  color: #c00;
+  font-weight: bold;
+  background: transparent;
+  border: 1px solid #c00;
+  border-radius: 6px;
+  padding: 6px 16px;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.logout-btn:hover {
+  background: #ffe5e5;
+}
+
+/* User info */
+.user-label {
+  font-style: italic;
+  font-size: 1rem;
+}
+
+/* Contenuto principale (scrolla sotto la top-bar) */
+.main-content {
+  margin: 0 auto;
+  margin-top: 24px;
+  max-width: 1280px;
+  background: #ff6600;
+  border-radius: 12px;
+  min-height: 80vh;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  padding: 32px 20px 40px 20px;
+}
+
+/* Logo fuori dal box */
+.login-logo,
+.app-logo {
+  text-align: center;
+  margin-top: 38px;
+  margin-bottom: 0;
+}
+.login-logo img,
+.app-logo img {
+  max-width: 130px;
+  height: auto;
+  display: block;
+  margin: 0 auto 12px auto;
+}
+
+/* Titoli */
+h1,
+h2 {
+  text-align: center;
+  color: #ff6600;
+  font-weight: bold;
+  letter-spacing: 0.01em;
+  margin-top: 0.2em;
+  margin-bottom: 1em;
+}
+
+h3 {
+  text-align: left;
+  color: #ffffff;
+  font-weight: bold;
+  letter-spacing: 0.01em;
+  margin-top: 0.2em;
+  margin-bottom: 1em;
+}
+/* Form stile uniforme */
+.login-form,
+.styled-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 22px 18px 16px 18px;
+  margin-top: 16px;
+}
+
+/* Input e select stile arrotondato */
+.styled-input,
+.login-form input,
+.login-form select,
+.styled-form input,
+.styled-form select {
+  font-size: 1.07rem;
+  padding: 10px 13px;
+  border: 1.5px solid #e1e1e1;
+  border-radius: 8px;
+  outline: none;
+  background: #fcfcfc;
+  margin-bottom: 0;
+  min-width: 140px;
+  transition: border 0.19s, background 0.16s;
+  box-sizing: border-box;
+}
+.styled-input:focus,
+.login-form input:focus,
+.login-form select:focus,
+.styled-form input:focus,
+.styled-form select:focus {
+  border: 1.7px solid #ff6600;
+  background: #fff8f3;
+}
+
+/* Pulsanti */
+.styled-btn,
+.login-form button,
+.styled-form button {
+  background: #ff6600;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  padding: 11px 26px;
+  font-size: 1.09rem;
+  margin-right: 7px;
+  margin-bottom: 0;
+  cursor: pointer;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03);
+  transition: background 0.18s, color 0.16s;
+}
+.styled-btn:hover,
+.login-form button:hover,
+.styled-form button:hover {
+  background: #cc5200;
+}
+
+/* Errori login */
+.login-error {
+  color: #c00;
+  margin-top: 12px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Responsive: box più stretto e colonna */
+@media (max-width: 800px) {
+  .app-main,
+  .login-form,
+  .styled-form {
+    max-width: 98vw;
+    padding: 16px 2vw 14px 2vw;
+  }
+  .login-logo img,
+  .app-logo img {
+    max-width: 105px;
+  }
+}
+@media (max-width: 650px) {
+  .login-form,
+  .styled-form {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+}
+
+/* Tabelle */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background: #fff;
+  font-size: 0.97rem;
+}
+th,
+td {
+  border: 1px solid #eee;
+  padding: 7px 9px;
+  text-align: left;
+}
+th {
+  background: #fff4e5;
+  color: #ff6600;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+tbody tr:nth-child(odd) {
+  background: #fff7f2;
+}
+
+/* Input di ricerca */
+input[type="text"],
+input[type="search"] {
+  border: 1.5px solid #e1e1e1;
+  border-radius: 7px;
+  padding: 8px 10px;
+  margin-bottom: 0;
+}
+input[type="text"]:focus,
+input[type="search"]:focus {
+  border: 1.5px solid #ff6600;
+  background: #fff7f0;
+}

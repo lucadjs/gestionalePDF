@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { FaEdit, FaTrash, FaCopy } from "react-icons/fa";
 import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -72,6 +73,15 @@ export default function LavorazioniForm() {
     }
   }
 
+  function handleDuplica(lav) {
+    // Crea una copia della lavorazione senza l'id
+    const copia = { ...lav };
+    delete copia.id;
+    setForm(copia);
+    setEditingId(null); // Modalità inserimento nuova lavorazione
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   function handleCancel() {
     setForm(initialFormState);
     setEditingId(null);
@@ -79,7 +89,7 @@ export default function LavorazioniForm() {
 
   return (
     <div>
-      <h2>Gestione Lavorazioni</h2>
+      <h3>Gestione Lavorazioni</h3>
       <form
         onSubmit={handleSubmit}
         style={{ display: "flex", flexWrap: "wrap", gap: 8 }}
@@ -203,20 +213,49 @@ export default function LavorazioniForm() {
                   <td>{tipiLav.find((t) => t.id === l.tipo_id)?.nome}</td>
                   <td>{l.descrizione}</td>
                   <td>{l.unita_misura}</td>
-                  <td>{l.prezzo}</td>
+                  <td>€ {l.prezzo}</td>
                   <td>{supporti.find((s) => s.id === l.supporto_id)?.nome}</td>
                   <td>{l.grammatura}</td>
                   <td>{l.note}</td>
-                  <td>
-                    <button type="button" onClick={() => handleEdit(l)}>
-                      Modifica
+                  <td style={{ display: "flex", gap: 8 }}>
+                    <button
+                      type="button"
+                      title="Duplica"
+                      onClick={() => handleDuplica(l)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
+                    >
+                      <FaCopy color="#ff6600" />
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleDelete(l.id)}
-                      style={{ color: "red" }}
+                      title="Modifica"
+                      onClick={() => handleEdit(l)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
                     >
-                      Cancella
+                      <FaEdit color="#ffd700" />
+                    </button>
+                    <button
+                      type="button"
+                      title="Cancella"
+                      onClick={() => handleDelete(l.id)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
+                    >
+                      <FaTrash color="red" />
                     </button>
                   </td>
                 </tr>

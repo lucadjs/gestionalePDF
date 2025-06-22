@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { FaEdit, FaTrash, FaCopy } from "react-icons/fa";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
@@ -75,6 +76,15 @@ export default function MaterialiForm() {
         setForm(initialFormState);
       }
     }
+  }
+
+  function handleDuplica(materiale) {
+    // Crea una copia senza id, pronto per inserimento
+    const copia = { ...materiale };
+    delete copia.id;
+    setForm(copia);
+    setEditingId(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function handleCancel() {
@@ -258,19 +268,48 @@ export default function MaterialiForm() {
                   <td>{m.dimensione}</td>
                   <td>{m.unita_misura}</td>
                   <td>{m.confezione}</td>
-                  <td>{m.prezzo_acquisto}</td>
-                  <td>{m.prezzo_vendita}</td>
+                  <td>€ {m.prezzo_acquisto}</td>
+                  <td>€ {m.prezzo_vendita}</td>
                   <td>{m.note}</td>
-                  <td>
-                    <button type="button" onClick={() => handleEdit(m)}>
-                      Modifica
+                  <td style={{ display: "flex", gap: 8 }}>
+                    <button
+                      type="button"
+                      title="Duplica"
+                      onClick={() => handleDuplica(m)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
+                    >
+                      <FaCopy color="#ff6600" />
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleDelete(m.id)}
-                      style={{ color: "red" }}
+                      title="Modifica"
+                      onClick={() => handleEdit(m)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
                     >
-                      Cancella
+                      <FaEdit color="#ffd700" />
+                    </button>
+                    <button
+                      type="button"
+                      title="Cancella"
+                      onClick={() => handleDelete(m.id)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
+                    >
+                      <FaTrash color="red" />
                     </button>
                   </td>
                 </tr>

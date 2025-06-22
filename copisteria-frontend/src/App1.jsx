@@ -7,6 +7,7 @@ import OrdiniForm from "./components/OrdiniForm";
 import UtentiForm from "./components/UtentiForm";
 import LoginForm from "./components/LoginForm";
 import axios from "axios";
+import "./login.css"; // <-- Qui metterai il CSS sotto
 
 const BUTTONS = [
   { key: "utenti", label: "Utenti", admin: true }, // solo admin!
@@ -48,43 +49,36 @@ export default function App() {
   if (!utente) return <LoginForm onLogin={handleLogin} />;
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Gestione Copisteria PDF</h1>
-      <div style={{ marginBottom: 12, display: "flex", gap: 12 }}>
-        {BUTTONS.filter(
-          (btn) => !btn.admin || utente.ruolo === "admin" // Se admin true, mostra solo se admin
-        ).map((btn) => (
-          <button
-            key={btn.key}
-            onClick={() => setSezione(btn.key)}
-            style={{
-              background: sezione === btn.key ? "#ffd700" : "#eee",
-              fontWeight: sezione === btn.key ? "bold" : "normal",
-              border: "1px solid #bbb",
-              borderRadius: 6,
-              padding: "8px 16px",
-              cursor: "pointer",
-              outline: "none",
-              boxShadow:
-                sezione === btn.key ? "0 2px 8px rgba(0,0,0,0.10)" : "none",
-            }}
-          >
-            {btn.label}
+    <div className="app-bg">
+      {/* ----- TOP BAR FISSA ----- */}
+      <div className="top-bar">
+        <h1 className="top-bar-title">Gestionale Copisteria PDF</h1>
+        <div className="top-bar-buttons">
+          {BUTTONS.filter((btn) => !btn.admin || utente.ruolo === "admin").map(
+            (btn) => (
+              <button
+                key={btn.key}
+                onClick={() => setSezione(btn.key)}
+                className={
+                  sezione === btn.key ? "top-bar-btn active" : "top-bar-btn"
+                }
+              >
+                {btn.label}
+              </button>
+            )
+          )}
+          <div style={{ flex: 1 }} />
+          <span className="user-label">
+            Utente: <b>{utente.nome}</b> ({utente.ruolo})
+          </span>
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
           </button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <span style={{ fontStyle: "italic", fontSize: 14 }}>
-          Utente: <b>{utente.nome}</b> ({utente.ruolo})
-        </span>
-        <button
-          style={{ marginLeft: 8, color: "#c00", fontWeight: "bold" }}
-          onClick={handleLogout}
-        >
-          Logout
-        </button>
+        </div>
       </div>
 
-      <div>
+      {/* ---- CONTENUTO SCROLLABILE ---- */}
+      <div className="main-content">
         {sezione === "utenti" && utente.ruolo === "admin" && <UtentiForm />}
         {sezione === "clienti" && <ClientiForm />}
         {sezione === "materiali" && <MaterialiForm />}

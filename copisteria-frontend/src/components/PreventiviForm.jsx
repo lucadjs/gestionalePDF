@@ -411,7 +411,7 @@ export default function PreventiviForm() {
   return (
     <div>
       <ToastContainer />
-      <h2>{editId ? "Modifica/Duplica Preventivo" : "Nuovo Preventivo"}</h2>
+      <h3>{editId ? "Modifica/Duplica Preventivo" : "Nuovo Preventivo"}</h3>
       {/* --- Form Nuovo/Modifica Preventivo --- */}
       <form
         onSubmit={handleSubmit}
@@ -619,9 +619,11 @@ export default function PreventiviForm() {
       </div>
       {/* Totale con IVA */}
       <div style={{ marginTop: 8, fontWeight: "bold" }}>
-        Totale netto: {totaleNetto.toFixed(2)} €<br />
-        IVA 22%: {iva} €<br />
-        <span style={{ fontSize: 18 }}>Totale ivato: {totaleIvato} €</span>
+        Totale netto: € {totaleNetto.toFixed(2)}
+        <br />
+        IVA 22%: € {iva}
+        <br />
+        <span style={{ fontSize: 18 }}>Totale ivato: € {totaleIvato}</span>
       </div>
       <h3 style={{ marginTop: 30 }}>Preventivi inseriti</h3>
       <input
@@ -664,7 +666,7 @@ export default function PreventiviForm() {
                     clienti.find((c) => c.id === p.clienteId)?.nome}
                 </td>
                 <td>{formattaDataIt(p.data)}</td>
-                <td>{p.totale} €</td>
+                <td>€ {p.totale}</td>
                 <td>{p.note}</td>
                 <td style={{ display: "flex", gap: 5 }}>
                   {/* DUPLICA: SEMPRE ATTIVO */}
