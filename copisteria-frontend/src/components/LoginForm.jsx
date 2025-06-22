@@ -16,11 +16,10 @@ export default function LoginForm({ onLogin }) {
         username,
         password,
       });
-      // Salva il token in localStorage
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("ruolo", res.data.ruolo);
       localStorage.setItem("username", res.data.username);
-      onLogin && onLogin(res.data); // callback (puoi settare utente loggato nello stato globale/app)
+      onLogin && onLogin(res.data);
     } catch (err) {
       setErrore(err.response?.data?.error || "Errore di autenticazione");
     }
@@ -29,15 +28,35 @@ export default function LoginForm({ onLogin }) {
   return (
     <form
       onSubmit={handleSubmit}
-      style={{ maxWidth: 500, margin: "30px auto" }}
+      style={{
+        maxWidth: 350,
+        margin: "60px auto",
+        display: "flex",
+        flexDirection: "column",
+        gap: 18,
+        padding: 28,
+        border: "1px solid #eee",
+        borderRadius: 10,
+        background: "#fff",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.07)",
+        alignItems: "stretch",
+      }}
     >
-      <h2>CopisteriaPDF - GESTIONALE</h2>
+      <h2 style={{ textAlign: "center", marginBottom: 8 }}>
+        CopisteriaPDF - GESTIONALE
+      </h2>
       <input
         placeholder="Username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         autoFocus
         required
+        style={{
+          padding: 10,
+          fontSize: 16,
+          borderRadius: 6,
+          border: "1px solid #ccc",
+        }}
       />
       <input
         type="password"
@@ -45,9 +64,35 @@ export default function LoginForm({ onLogin }) {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
+        style={{
+          padding: 10,
+          fontSize: 16,
+          borderRadius: 6,
+          border: "1px solid #ccc",
+        }}
       />
-      <button type="submit">Login</button>
-      {errore && <div style={{ color: "red" }}>{errore}</div>}
+      <button
+        type="submit"
+        style={{
+          padding: 12,
+          fontSize: 16,
+          borderRadius: 6,
+          border: "none",
+          background: "#ff6600",
+          color: "#fff",
+          fontWeight: "bold",
+          marginTop: 8,
+          cursor: "pointer",
+          transition: "background 0.2s",
+        }}
+      >
+        Login
+      </button>
+      {errore && (
+        <div style={{ color: "red", textAlign: "center", marginTop: 4 }}>
+          {errore}
+        </div>
+      )}
     </form>
   );
 }
