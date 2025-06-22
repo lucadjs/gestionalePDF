@@ -1,19 +1,20 @@
-// routes/utenti.js
 import express from "express";
 import bcrypt from "bcrypt";
 import { Utente } from "../models/index.js";
+import { authRequired, onlyAdmin } from "../middlewares/auth.js"; // <---
+
 const router = express.Router();
 
-// LISTA utenti (admin solo) - puoi proteggerla con middleware in seguito
-router.get("/", async (req, res) => {
+// LISTA utenti (solo admin)
+router.get("/", authRequired, onlyAdmin, async (req, res) => {
   const list = await Utente.findAll();
   res.json(list);
 });
 
-// AGGIUNGI utente (admin)
-router.post("/", async (req, res) => {
+// AGGIUNGI utente (solo admin)
+router.post("/", authRequired, onlyAdmin, async (req, res) => {
   const {
-    nome, // CAMBIATO da username a nome!
+    nome, // <-- o username, usa quello che hai nel modello!
     password,
     email,
     ruolo = "privato",
@@ -23,7 +24,7 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ error: "Nome e password obbligatori" });
   const hash = await bcrypt.hash(password, 10);
   const utente = await Utente.create({
-    nome, // CAMBIATO da username a nome!
+    nome,
     password_hash: hash,
     email,
     ruolo,
@@ -32,8 +33,8 @@ router.post("/", async (req, res) => {
   res.json(utente);
 });
 
-// MODIFICA utente (puoi anche proteggere per ruolo admin)
-router.put("/:id", async (req, res) => {
+// MODIFICA utente (solo admin)
+router.put("/:id", authRequired, onlyAdmin, async (req, res) => {
   const { email, ruolo, attivo, password } = req.body;
   const utente = await Utente.findByPk(req.params.id);
   if (!utente) return res.status(404).json({ error: "Utente non trovato" });
@@ -45,8 +46,8 @@ router.put("/:id", async (req, res) => {
   res.json(utente);
 });
 
-// DISATTIVA/ATTIVA utente (toggle)
-router.patch("/:id/attivo", async (req, res) => {
+// DISATTIVA/ATTIVA utente (solo admin)
+router.patch("/:id/attivo", authRequired, onlyAdmin, async (req, res) => {
   const utente = await Utente.findByPk(req.params.id);
   if (!utente) return res.status(404).json({ error: "Utente non trovato" });
   utente.attivo = !utente.attivo;
@@ -55,7 +56,7 @@ router.patch("/:id/attivo", async (req, res) => {
 });
 
 // CANCELLA utente (solo admin)
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authRequired, onlyAdmin, async (req, res) => {
   const utente = await Utente.findByPk(req.params.id);
   if (!utente) return res.status(404).json({ error: "Utente non trovato" });
   await utente.destroy();

@@ -15,6 +15,7 @@ import clientiRoutes from "./api/clienti.js";
 import preventiviRouter from "./api/preventivi.js";
 import ordiniRoutes from "./api/ordini.js";
 import utentiRouter from "./api/utenti.js";
+import loginRouter from "./api/login.js";
 
 dotenv.config();
 
@@ -27,7 +28,7 @@ app.use(express.urlencoded({ limit: "20mb", extended: true }));
 app.use(
   cors({
     origin: [
-      "http://localhost:3000", // frontend React locale
+      "http://localhost:5173", // frontend React locale
       "https://gestionale-pdf.vercel.app", // produzione (opzionale, se vuoi anche testare da prod)
     ],
     credentials: true, // Solo se usi cookie/autenticazione con credenziali
@@ -42,6 +43,7 @@ app.use("/api/clienti", clientiRoutes);
 app.use("/api/preventivi", preventiviRouter);
 app.use("/api/ordini", ordiniRoutes);
 app.use("/api/utenti", utentiRouter);
+app.use("/api/login", loginRouter);
 
 app.get("/", (req, res) => res.send("API Copisteria OK"));
 
