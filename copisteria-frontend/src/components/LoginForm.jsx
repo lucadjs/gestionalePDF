@@ -31,7 +31,7 @@ export default function LoginForm({ onLogin }) {
       onSubmit={handleSubmit}
       style={{ maxWidth: 300, margin: "30px auto" }}
     >
-      <h2>Accesso</h2>
+      <h2>CopisteriaPDF - GESTIONALE</h2>
       <input
         placeholder="Username"
         value={username}
