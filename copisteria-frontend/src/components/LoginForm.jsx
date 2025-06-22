@@ -29,7 +29,7 @@ export default function LoginForm({ onLogin }) {
   return (
     <form
       onSubmit={handleSubmit}
-      style={{ maxWidth: 300, margin: "30px auto" }}
+      style={{ maxWidth: 500, margin: "30px auto" }}
     >
       <h2>CopisteriaPDF - GESTIONALE</h2>
       <input
