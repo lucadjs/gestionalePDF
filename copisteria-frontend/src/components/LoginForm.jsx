@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../login.css"; // Metti il percorso corretto rispetto al file!
+import "../login.css";
 
 const LOGO_URL = "/logo.png";
 
@@ -30,28 +30,36 @@ export default function LoginForm({ onLogin }) {
 
   return (
     <div className="login-bg">
-      <div className="login-logo">
-        <img src={LOGO_URL} alt="Logo CopisteriaPDF" />
+      <div className="login-centerbox">
+        <img
+          src={LOGO_URL}
+          alt="Logo CopisteriaPDF"
+          className="login-logo-img"
+        />
+        <form className="login-form-col" onSubmit={handleSubmit}>
+          <h2 className="login-title">GESTIONALE</h2>
+          <input
+            className="login-input"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoFocus
+            required
+          />
+          <input
+            className="login-input"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button className="login-btn" type="submit">
+            Login
+          </button>
+          {errore && <div className="login-error">{errore}</div>}
+        </form>
       </div>
-      <form className="login-form" onSubmit={handleSubmit}>
-        <h2>GESTIONALE</h2>
-        <input
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          autoFocus
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Login</button>
-        {errore && <div className="login-error">{errore}</div>}
-      </form>
     </div>
   );
 }

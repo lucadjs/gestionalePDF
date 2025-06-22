@@ -94,7 +94,7 @@ export default function MaterialiForm() {
 
   return (
     <div>
-      <h2>Gestione Materiali</h2>
+      <h3>Gestione Materiali</h3>
       <form
         onSubmit={handleSubmit}
         style={{ display: "flex", flexWrap: "wrap", gap: 8 }}
@@ -206,7 +206,7 @@ export default function MaterialiForm() {
         style={{ margin: "16px 0", width: 240 }}
       />
 
-      <h3 style={{ marginTop: 10 }}>Materiali inseriti</h3>
+      <h4 style={{ marginTop: 10 }}>Materiali inseriti</h4>
       <div
         style={{
           maxHeight: 320,

@@ -284,7 +284,7 @@ export default function OrdiniForm() {
   return (
     <div>
       <ToastContainer />
-      <h2>{editId ? "Modifica Ordine" : "Nuovo Ordine"}</h2>
+      <h3>{editId ? "Modifica Ordine" : "Nuovo Ordine"}</h3>
       {/* --- Form Nuovo/Modifica Ordine --- */}
       <form
         onSubmit={handleSubmit}
@@ -388,46 +388,6 @@ export default function OrdiniForm() {
           Aggiungi
         </button>
       </div>
-      <div style={{ margin: "16px 0" }}>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleLogoChange}
-          style={{ marginRight: 16 }}
-        />
-        <button
-          type="button"
-          onClick={() =>
-            esportaPDF(
-              {
-                ...form,
-                id: ultimoOrdineId || editId,
-                totale: totaleIvato,
-                data: form.data,
-                clienteId: form.clienteId,
-              },
-              righe
-            )
-          }
-          disabled={righe.length === 0 || !(ultimoOrdineId || editId)}
-          style={{
-            cursor:
-              righe.length === 0 || !(ultimoOrdineId || editId)
-                ? "default"
-                : "pointer",
-          }}
-          title={
-            !(ultimoOrdineId || editId)
-              ? "Salva prima l’ordine per PDF col numero reale"
-              : "Esporta PDF"
-          }
-        >
-          <FaFilePdf
-            style={{ color: "#ff6600", fontSize: 18, verticalAlign: "middle" }}
-          />{" "}
-          Esporta PDF
-        </button>
-      </div>
       {/* Tabella righe */}
       <div
         style={{
@@ -486,10 +446,16 @@ export default function OrdiniForm() {
         </table>
       </div>
       {/* Totale con IVA */}
-      <div style={{ marginTop: 8, fontWeight: "bold" }}>
-        Totale netto: {totaleNetto.toFixed(2)} €<br />
-        IVA 22%: {iva} €<br />
-        <span style={{ fontSize: 18 }}>Totale ivato: {totaleIvato} €</span>
+      <div className="totali-box">
+        <div className="totale-row">
+          Totale netto: <b>€ {totaleNetto.toFixed(2)}</b>
+        </div>
+        <div className="totale-row">
+          IVA 22%: <b>€ {iva}</b>
+        </div>
+        <div className="totale-row totale-ivato">
+          Totale ivato: <b>€ {totaleIvato}</b>
+        </div>
       </div>
       <h3 style={{ marginTop: 30 }}>Ordini inseriti</h3>
       <input

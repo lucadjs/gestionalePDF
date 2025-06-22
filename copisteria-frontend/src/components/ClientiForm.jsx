@@ -93,7 +93,7 @@ export default function ClientiForm() {
 
   return (
     <div>
-      <h2>Anagrafica Clienti</h2>
+      <h3>Anagrafica Clienti</h3>
       <form
         onSubmit={handleSubmit}
         style={{ display: "flex", flexWrap: "wrap", gap: 8 }}
@@ -208,7 +208,7 @@ export default function ClientiForm() {
         style={{ margin: "16px 0", width: 240 }}
       />
 
-      <h3 style={{ marginTop: 10 }}>Clienti inseriti</h3>
+      <h4 style={{ marginTop: 10 }}>Clienti inseriti</h4>
       <div
         style={{
           maxHeight: 320,

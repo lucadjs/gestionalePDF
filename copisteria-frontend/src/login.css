@@ -42,7 +42,8 @@ body,
 
 /* Titolo centrato sopra i bottoni */
 .top-bar-title {
-  margin: 0;
+  margin-top: 0px;
+  margin-bottom: 10px;
   padding: 16px 24px 4px 24px;
   color: #ff6600;
   font-size: 2rem;
@@ -66,7 +67,7 @@ body,
   border-radius: 6px;
   padding: 8px 16px;
   font-weight: normal;
-  font-size: 1rem;
+  font-size: 10pt;
   cursor: pointer;
   outline: none;
   box-shadow: none;
@@ -75,6 +76,10 @@ body,
 .top-bar-btn.active {
   background: #ffd700;
   font-weight: bold;
+}
+
+.top-bar-btn:hover {
+  background: #ffd700;
 }
 
 /* Logout button */
@@ -107,8 +112,25 @@ body,
   background: #ff6600;
   border-radius: 12px;
   min-height: 80vh;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
-  padding: 32px 20px 40px 20px;
+  padding: 0px 20px 40px 20px;
+}
+.login-form-col {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 32px rgba(0, 0, 0, 0.11);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  min-width: 290px;
+  padding: 32px 32px 24px 32px;
+}
+
+.login-logo-img {
+  width: 250px;
+  height: auto;
+  margin-bottom: 30px;
+  margin-top: 18px;
 }
 
 /* Logo fuori dal box */
@@ -141,9 +163,61 @@ h3 {
   text-align: left;
   color: #ffffff;
   font-weight: bold;
+  font-size: 18pt;
   letter-spacing: 0.01em;
   margin-top: 0.2em;
   margin-bottom: 1em;
+}
+
+h4 {
+  text-align: left;
+  color: #ffffff;
+  font-weight: bold;
+  letter-spacing: 0.01em;
+  margin-top: 0px;
+  margin-bottom: 1em;
+  padding-top: 0px;
+}
+
+h5 {
+  text-align: right;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 14pt;
+  letter-spacing: 0.01em;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+.totali-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  font-weight: bold;
+  font-size: 1.09rem;
+}
+
+.totale-row {
+  color: #fff;
+  background: transparent;
+  margin: 0;
+  padding: 0 2px;
+  line-height: 1.2;
+}
+
+.totale-ivato {
+  font-size: 1.19rem;
+  color: #ffd700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.11);
+  margin-top: 2px;
+}
+
+.login-centerbox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 /* Form stile uniforme */
 .login-form,
