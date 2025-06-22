@@ -30,6 +30,7 @@ app.use(
     origin: [
       "http://localhost:5173", // frontend React locale
       "https://gestionale-pdf.vercel.app", // produzione (opzionale, se vuoi anche testare da prod)
+      "https://gestionale.copisteriapdf.it",
     ],
     credentials: true, // Solo se usi cookie/autenticazione con credenziali
   })
