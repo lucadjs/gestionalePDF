@@ -16,6 +16,7 @@ import preventiviRouter from "./api/preventivi.js";
 import ordiniRoutes from "./api/ordini.js";
 import utentiRouter from "./api/utenti.js";
 import loginRouter from "./api/login.js";
+import contattiRouter from "./api/contatti.js";
 
 dotenv.config();
 
@@ -45,6 +46,7 @@ app.use("/api/preventivi", preventiviRouter);
 app.use("/api/ordini", ordiniRoutes);
 app.use("/api/utenti", utentiRouter);
 app.use("/api/login", loginRouter);
+app.use("/api/contatti", contattiRouter);
 
 app.get("/", (req, res) => res.send("API Copisteria OK"));
 
