@@ -37,6 +37,8 @@ app.use(
     credentials: true, // Solo se usi cookie/autenticazione con credenziali
   })
 );
+
+app.use("/api/contatti", contattiRouter);
 app.use(express.json());
 
 app.use("/api/materiali", materialiRoutes);
@@ -47,7 +49,7 @@ app.use("/api/preventivi", preventiviRouter);
 app.use("/api/ordini", ordiniRoutes);
 app.use("/api/utenti", utentiRouter);
 app.use("/api/login", loginRouter);
-app.use("/api/contatti", contattiRouter);
+// app.use("/api/contatti", contattiRouter);
 
 app.get("/", (req, res) => res.send("API Copisteria OK"));
 
