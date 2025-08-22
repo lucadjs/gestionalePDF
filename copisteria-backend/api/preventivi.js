@@ -29,6 +29,8 @@ router.get("/", async (req, res) => {
   res.json(list);
 });
 
+router.get("/health", (req, res) => res.send("contatti ok"));
+
 // --- POST nuovo preventivo con righe ---
 router.post("/", async (req, res) => {
   const { clienteId, data, note, totale, righe } = req.body;
