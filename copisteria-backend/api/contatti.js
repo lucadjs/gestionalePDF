@@ -3,6 +3,8 @@ import nodemailer from "nodemailer";
 
 const router = express.Router();
 
+router.get("/health", (req, res) => res.send("contatti ok"));
+
 router.post("/", async (req, res) => {
   try {
     const { name, email, message } = req.body || {};
